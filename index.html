@@ -1,1 +1,381 @@
 
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوابة أنشطة - ماتيا الجليل</title>
+    
+    <!-- خط Cairo الجميل والمعتمد للموقع -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --text-main: #0f172a;    
+            --text-muted: #334155;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            /* تدرج لوني مريح وممتع بصرياً للأطفال يحاكي حوض الأسماك الهادئ */
+            background: linear-gradient(180deg, #7dd3fc 0%, #0ea5e9 40%, #0369a1 100%);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden; 
+            position: relative;
+        }
+
+        /* حاوية الأكفاريوم (الأسماك والفقاعات الخلفية) */
+        .aquarium {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none; 
+        }
+
+        .fish, .bubble { position: absolute; user-select: none; }
+
+        .bubble { font-size: 24px; animation: floatUp linear infinite; opacity: 0.6; }
+        .fish { font-size: 45px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
+
+        .fish-rtl { animation: swimRTL linear infinite; }
+        .fish-ltr { animation: swimLTR linear infinite; transform: scaleX(-1); }
+
+        /* حجم الأسماك الأفقية الكبيرة وسرعة حركتها في الأسفل */
+        .f1 { bottom: 10%; animation-duration: 25s; font-size: 80px; }
+        .f2 { bottom: 25%; animation-duration: 35s; font-size: 70px; animation-delay: 5s; }
+        .f3 { bottom: 15%; animation-duration: 28s; font-size: 90px; animation-delay: 2s; }
+        .f5 { bottom: 20%; animation-duration: 30s; font-size: 85px; animation-delay: 15s; }
+        
+        /* حركة تصاعد فقاعات الماء */
+        .b1 { left: 10%; bottom: -5%; animation-duration: 8s; animation-delay: 0s; font-size: 20px;}
+        .b2 { left: 30%; bottom: -5%; animation-duration: 12s; animation-delay: 3s; font-size: 30px;}
+        .b3 { left: 60%; bottom: -5%; animation-duration: 10s; animation-delay: 1s; font-size: 15px;}
+        .b4 { left: 85%; bottom: -5%; animation-duration: 14s; animation-delay: 5s; font-size: 25px;}
+
+        /* --- الكائنات التي تسبح بشكل عمودي (أعلى وأسفل) --- */
+        .v-creature {
+            position: fixed; 
+            user-select: none;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+            animation: floatUpDown ease-in-out infinite;
+            pointer-events: none; /* لمنع حجب إمكانية الضغط على الكروت */
+        }
+        
+        /* الأخطبوط يسبح بهدوء في الخلفية اليسرى */
+        .v1 { left: 15%; bottom: -10%; animation-duration: 20s; font-size: 75px; z-index: 0;} 
+        
+        /* قنديل البحر الرائع يطفو في منتصف الشاشة وفوق البطاقات مباشرة لمزيد من التفاعل */
+        .v2 { 
+            left: 50%; 
+            transform: translateX(-50%);
+            bottom: -15%; 
+            animation-duration: 22s; 
+            font-size: 85px; 
+            animation-delay: 2s; 
+            z-index: 50; /* يجعله يمر فوق محتوى الصفحة */
+        } 
+
+        /* --- كائنات قاع البحر النابضة بالتنفس --- */
+        .bottom-creature {
+            position: absolute; 
+            user-select: none; 
+            animation: pulseScale 4s ease-in-out infinite; 
+            z-index: 1;
+        }
+        .c-crab { right: 8%; bottom: 15px; font-size: 65px; animation-delay: 0s; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15)); }
+        .c-shell { right: 20%; bottom: 5px; font-size: 55px; animation-delay: 1s; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15)); }
+        
+        /* نجم البحر في أقصى اليسار مع فلتر التلوين للأحمر البني */
+        .c-star { 
+            left: 8%; 
+            bottom: 25px; 
+            font-size: 60px; 
+            animation-delay: 2s; 
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)) sepia(0.7) hue-rotate(330deg) saturate(3) brightness(0.7); 
+        }
+
+        /* --- زر الصوت الزجاجي الأنيق --- */
+        .sound-btn {
+            position: fixed; 
+            top: 20px; 
+            right: 20px; 
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px); 
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            border-radius: 30px; 
+            padding: 10px 20px; 
+            font-family: 'Cairo', sans-serif;
+            font-size: 16px; 
+            font-weight: bold; 
+            color: #0369a1; 
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            z-index: 100; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            transition: all 0.3s;
+        }
+        .sound-btn:hover { background: #ffffff; transform: scale(1.05); }
+        .sound-btn.playing { background: #e0f2fe; border-color: #7dd3fc; }
+
+        /* تأثيرات الحركة والسباحة الدائرية */
+        @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 0; } 10% { opacity: 0.8; } 100% { transform: translateY(-120vh) scale(1.5); opacity: 0; } }
+        @keyframes swimRTL { 0% { right: -100px; transform: translateY(0px) scaleX(1); } 25% { transform: translateY(-20px) scaleX(1); } 50% { transform: translateY(0px) scaleX(1); } 75% { transform: translateY(20px) scaleX(1); } 100% { right: calc(100vw + 100px); transform: translateY(0px) scaleX(1); } }
+        @keyframes swimLTR { 0% { left: -100px; transform: translateY(0px) scaleX(-1); } 25% { transform: translateY(20px) scaleX(-1); } 50% { transform: translateY(0px) scaleX(-1); } 75% { transform: translateY(-20px) scaleX(-1); } 100% { left: calc(100vw + 100px); transform: translateY(0px) scaleX(-1); } }
+        
+        /* حركة الصعود والهبوط للكائنات المائية */
+        @keyframes floatUpDown {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-65vh) rotate(5deg); }
+        }
+        @keyframes pulseScale { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+
+        /* --- المحتوى الرئيسي للواجهة --- */
+        .content-wrapper { 
+            position: relative; 
+            z-index: 10; 
+            width: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+        
+        .header { 
+            text-align: center; 
+            margin-bottom: 40px; 
+            max-width: 800px; 
+            animation: fadeInDown 1s ease; 
+        }
+        
+        .header-badge { 
+            background: rgba(255, 255, 255, 0.9); 
+            color: #0369a1; 
+            padding: 8px 24px; 
+            border-radius: 30px; 
+            font-size: 15px; 
+            font-weight: bold; 
+            display: inline-block; 
+            margin-bottom: 15px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+        }
+        
+        .header h1 { 
+            color: #ffffff; 
+            font-size: 46px; 
+            font-weight: 900; 
+            margin: 0 0 15px 0; 
+            text-shadow: 0 4px 10px rgba(0,0,0,0.2); 
+        }
+        
+        .header p { 
+            color: #f0f9ff; 
+            font-size: 19px; 
+            line-height: 1.6; 
+            margin: 0; 
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            font-weight: bold; 
+        }
+        
+        /* شبكة عرض كروت وبطاقات الأنشطة */
+        .cards-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 25px; 
+            width: 100%; 
+            max-width: 1100px; 
+        }
+        
+        /* تصميم كروت الأنشطة بتأثير الزجاج الحديث (Glassmorphism) */
+        .card { 
+            background: rgba(255, 255, 255, 0.85); 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px); 
+            border: 2px solid rgba(255, 255, 255, 0.8); 
+            border-radius: 24px; 
+            padding: 35px 25px; 
+            text-align: center; 
+            text-decoration: none; 
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); 
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            position: relative; 
+            animation: fadeInUp 0.8s ease backwards; 
+        }
+        
+        /* ألوان حدود البطاقات المنعشة والجاذبة للأطفال */
+        .card:nth-child(1) { animation-delay: 0.1s; border-top: 6px solid #f59e0b; }
+        .card:nth-child(2) { animation-delay: 0.2s; border-top: 6px solid #ec4899; }
+        .card:nth-child(3) { animation-delay: 0.3s; border-top: 6px solid #10b981; }
+        .card:nth-child(4) { animation-delay: 0.4s; border-top: 6px solid #8b5cf6; }
+        
+        .card:hover { 
+            transform: translateY(-12px) scale(1.02); 
+            background: rgba(255, 255, 255, 0.95); 
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2); 
+        }
+        
+        .card-icon-wrapper { 
+            width: 85px; 
+            height: 85px; 
+            background: rgba(255, 255, 255, 0.9); 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 45px; 
+            margin-bottom: 20px; 
+            transition: transform 0.4s; 
+            box-shadow: 0 8px 16px rgba(0,0,0,0.08); 
+        }
+        .card:hover .card-icon-wrapper { transform: scale(1.15) rotate(10deg); }
+        
+        .card-title { color: var(--text-main); font-size: 23px; font-weight: 900; margin: 0 0 12px 0; }
+        .card-desc { color: var(--text-muted); font-size: 16px; line-height: 1.6; font-weight: bold; margin: 0 0 25px 0; flex-grow: 1; }
+        .card-btn { background: #0284c7; color: white; font-weight: bold; font-size: 16px; padding: 12px 35px; border-radius: 25px; transition: all 0.3s; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(2, 132, 199, 0.3); }
+        .card:hover .card-btn { background: #0369a1; transform: scale(1.05); box-shadow: 0 6px 20px rgba(2, 132, 199, 0.4); }
+        
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 600px) { .header h1 { font-size: 34px; } .card { padding: 30px 20px; } .fish { font-size: 55px; } }
+
+        /* تصميم قسم تذييل الصفحة الخاص بحقوق البرمجة ونسبها إليكِ بنجاح */
+        .site-footer {
+            margin-top: 60px; 
+            text-align: center; 
+            color: #f0f9ff; 
+            font-size: 18px; 
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2); 
+            padding: 20px; 
+            border-top: 1px dashed rgba(255, 255, 255, 0.3);
+            width: 100%; 
+            max-width: 800px;
+        }
+        .site-footer span { color: #fef08a; }
+    </style>
+</head>
+<body>
+
+    <!-- حوض الأسماك والبيئة المائية الخلفية -->
+    <div class="aquarium">
+        <div class="bubble b1">🫧</div><div class="bubble b2">🫧</div><div class="bubble b3">🫧</div><div class="bubble b4">🫧</div>
+        
+        <!-- أسماك مبهجة أفقية سفلية -->
+        <div class="fish fish-rtl f1">🐠</div>
+        <div class="fish fish-ltr f2">🐟</div>
+        <div class="fish fish-rtl f3">🐡</div>
+        <div class="fish fish-ltr f5">🐠</div> 
+        
+        <!-- كائنات القاع الساحلية النابضة بهدوء -->
+        <div class="bottom-creature c-crab" title="سلطعون">🦀</div>
+        <div class="bottom-creature c-shell" title="صدفة">🐚</div>
+        <div class="bottom-creature c-star" title="نجم بحر">⭐</div>
+    </div>
+
+    <!-- كائنات تسبح بشكل عمودي (مستقلة عن الأكفاريوم للتحكم بالواجهة والأسبقية البصرية) -->
+    <div class="v-creature v1" title="أخطبوط">🐙</div>
+    <!-- قنديل البحر الرائع يمر في منتصف الشاشة وفوق الكروت كالعنصر السحري العائم -->
+    <div class="v-creature v2" title="قنديل البحر">🪼</div>
+
+    <!-- عنصر الصوت (أمواج بحر هادئة وناعمة جداً ملائمة للاسترخاء التام) -->
+    <audio id="oceanAudio" loop preload="auto" crossorigin="anonymous">
+        <source src="https://cdn.freesound.org/previews/404/404329_5121236-lq.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- زر تشغيل الصوت العلوي الثابت -->
+    <button class="sound-btn" id="soundToggleBtn" onclick="toggleSound()">
+        🔊 تشغيل صوت البحر
+    </button>
+
+    <!-- المحتوى الفعلي المنسق للموقع -->
+    <div class="content-wrapper">
+        <div class="header">
+            <div class="header-badge">🌊 مرحباً بك في عالم الإبداع والهدوء</div>
+            <h1>بوابة أنشطة ماتيا الجليل</h1>
+            <p>مساحة آمنة وممتعة للأبطال للتعبير عن أنفسهم، استكشاف مشاعرهم، وصنع أجمل الذكريات. خذ نفساً عميقاً واختر نشاطك المفضل لتبدأ رحلتك!</p>
+        </div>
+
+        <div class="cards-grid">
+            <!-- الكرت الأول: معلوماتي الشخصية -->
+            <a href="personal_info.html" class="card">
+                <div class="card-icon-wrapper">🧮</div>
+                <h2 class="card-title">معلوماتي الشخصية</h2>
+                <p class="card-desc">استخدم سحر الرياضيات والأرقام لتحكي قصة روتينك اليومي وتصنع بطاقة حظك السحرية.</p>
+                <div class="card-btn">ابدأ النشاط <span>←</span></div>
+            </a>
+            
+            <!-- الكرت الثاني: مشاعري المدرسية -->
+            <a href="school_feelings.html" class="card">
+                <div class="card-icon-wrapper">🎒</div>
+                <h2 class="card-title">مشاعري المدرسية</h2>
+                <p class="card-desc">كيف تشعر تجاه المدرسة؟ اختر الرموز التعبيرية واصنع لوحة مشاعرك الخاصة بكل حرية.</p>
+                <div class="card-btn">ابدأ النشاط <span>←</span></div>
+            </a>
+            
+            <!-- الكرت الثالث: كل شيء عني -->
+            <a href="all_about_me.html" class="card">
+                <div class="card-icon-wrapper">🌟</div>
+                <h2 class="card-title">كل شيء عني</h2>
+                <p class="card-desc">أخبرنا عن طعامك المفضل، هواياتك، وأسرارك الطريفة لننسج معاً قصتك النثرية المترابطة.</p>
+                <div class="card-btn">ابدأ النشاط <span>←</span></div>
+            </a>
+            
+            <!-- الكرت الرابع: قصيدة هذا أنا -->
+            <a href="i_am_poem.html" class="card">
+                <div class="card-icon-wrapper">✍️</div>
+                <h2 class="card-title">قصيدة: هذا أنا</h2>
+                <p class="card-desc">نشاط أدبي رائع. أطلق العنان لمخيلتك، وعبر عن أحلامك ومخاوفك في قصيدة فنية جميلة.</p>
+                <div class="card-btn">ابدأ النشاط <span>←</span></div>
+            </a>
+        </div>
+
+        <!-- تذييل الموقع بتوقيعك الرائع والمميز -->
+        <div class="site-footer">
+            تطوير وبرمجة <span>ناديا الحاج</span> لصالح مؤسسة <span>ماتيا الجليل</span>
+        </div>
+    </div>
+
+    <!-- أكواد جافاسكريبت للتحكم بالصوت -->
+    <script>
+        const audio = document.getElementById('oceanAudio');
+        const soundBtn = document.getElementById('soundToggleBtn');
+        let isPlaying = false;
+
+        function toggleSound() {
+            if (isPlaying) {
+                audio.pause();
+                soundBtn.innerHTML = '🔊 تشغيل صوت البحر';
+                soundBtn.classList.remove('playing');
+                isPlaying = false;
+            } else {
+                audio.volume = 0.3; // تعيين مستوى مريح جداً وصامت كهمس هادئ (30%)
+                
+                let playPromise = audio.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.then(_ => {
+                        soundBtn.innerHTML = '🔇 إيقاف صوت البحر';
+                        soundBtn.classList.add('playing');
+                        isPlaying = true;
+                    })
+                    .catch(error => {
+                        console.error("مشكلة في تشغيل الصوت:", error);
+                        alert("عذراً! يبدو أن المتصفح يمنع تشغيل الصوت تلقائياً. تأكدي من السماح بالصوت في إعدادات متصفحك أو جهازك.");
+                    });
+                }
+            }
+        }
+    </script>
+</body>
+</html>
