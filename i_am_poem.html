@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قصيدة: هذا أنا</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        :root {
+            /* هوية بصرية فنية دافئة تناسب الشعر (تدرجات الخوخي والوردي) */
+            --primary-color: #f43f5e; /* وردي حيوي */
+            --secondary-color: #f97316; /* برتقالي دافئ */
+            --text-color: #334155;    
+            --bg-pastel: #fff1f2;     /* خلفية وردية فاتحة جداً */
+            --white: #ffffff;
+            --emoji-size: 26px;       
+            --content-padding: 40px;  
+            
+            --btn-grad-1: linear-gradient(135deg, #f43f5e, #e11d48); 
+            --btn-grad-2: linear-gradient(135deg, #f97316, #ea580c); 
+            --btn-clear-grad: linear-gradient(135deg, #64748b, #475569);
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #fce7f3 0%, #ffedd5 100%);
+            margin: 0;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* صندوق الأدوات ومعرض الإيموجي */
+        .toolbar, .emoji-gallery {
+            background-color: var(--white);
+            padding: 15px 25px; border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(244, 63, 94, 0.08);
+            display: flex; flex-wrap: wrap; gap: 15px; align-items: center;
+            margin-bottom: 20px; width: 100%; max-width: 900px; justify-content: center;
+        }
+        .emoji-gallery { flex-wrap: nowrap; overflow-x: auto; padding: 15px; }
+        .toolbar label { font-weight: bold; color: var(--primary-color); font-size: 14px; }
+        .toolbar input, .toolbar select {
+            border: 2px solid #fecdd3; border-radius: 8px; padding: 6px 10px;
+            font-family: 'Cairo', sans-serif; font-size: 13px; outline: none; transition: 0.2s;
+        }
+        .toolbar input:focus, .toolbar select:focus { border-color: var(--primary-color); }
+
+        .emoji-btn {
+            width: 48px; height: 48px; background: #f8fafc; border: 3px solid #e2e8f0;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 24px; cursor: pointer; transition: all 0.3s; flex-shrink: 0;
+        }
+        .emoji-btn:hover { transform: scale(1.15) translateY(-2px); border-color: #fda4af; }
+        .emoji-btn.active { border-color: #f59e0b; background: #fff; transform: scale(1.1); box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);}
+
+        /* منطقة الورقة */
+        .capture-area {
+            background-color: var(--bg-pastel); color: var(--text-color); 
+            border-radius: 24px; width: 100%; max-width: 900px; 
+            box-shadow: 0 15px 35px rgba(244, 63, 94, 0.15);
+            position: relative; overflow: hidden; box-sizing: border-box;
+            border: 4px solid #fff;
+        }
+
+        .emoji-border-container { position: absolute; display: flex; justify-content: space-between; align-items: center; user-select: none; pointer-events: none; }
+        .border-top { top: 12px; left: 15px; right: 15px; height: 35px; flex-direction: row; }
+        .border-bottom { bottom: 12px; left: 15px; right: 15px; height: 35px; flex-direction: row; }
+        .border-left { top: 50px; bottom: 50px; left: 15px; width: 35px; flex-direction: column; }
+        .border-right { top: 50px; bottom: 50px; right: 15px; width: 35px; flex-direction: column; }
+        .emoji-item { font-size: var(--emoji-size); line-height: 1; transition: 0.2s; }
+
+        .worksheet-content { padding: var(--content-padding); box-sizing: border-box; width: 100%; }
+
+        .header-banner {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color)); color: var(--white);
+            padding: 25px; border-radius: 18px; text-align: center; margin-bottom: 25px; box-shadow: 0 6px 18px rgba(244, 63, 94, 0.25);
+        }
+        .header-banner h1 { margin: 0; font-size: 34px; text-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+        .header-banner p { margin: 10px 0 0 0; font-size: 16px; font-weight: bold; }
+
+        /* اختيار الجنس */
+        .gender-selector-container {
+            display: flex; gap: 15px; align-items: center; justify-content: center; margin-bottom: 25px;
+            background: rgba(255,255,255,0.7); padding: 15px; border-radius: 16px; border: 1px dashed #fda4af;
+        }
+        .gender-btn {
+            font-family: 'Cairo', sans-serif; font-size: 16px; font-weight: bold; padding: 10px 24px; 
+            border: 2px solid #cbd5e1; border-radius: 24px; cursor: pointer; transition: all 0.3s; 
+            display: flex; align-items: center; gap: 8px; background-color: var(--white);
+        }
+        .gender-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .gender-btn#genderBoy.active { background: linear-gradient(135deg, #0ea5e9, #0284c7); color: #fff; border-color: #0ea5e9; }
+        .gender-btn#genderGirl.active { background: linear-gradient(135deg, #ec4899, #be185d); color: #fff; border-color: #ec4899; }
+
+        /* مقاطع القصيدة */
+        .stanza-card {
+            background: rgba(255, 255, 255, 0.85); border-radius: 18px; padding: 25px; margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 2px solid #ffe4e6; position: relative;
+        }
+        .stanza-title {
+            position: absolute; top: -15px; right: 20px; background: var(--secondary-color); color: #fff;
+            padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 14px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .input-row {
+            display: flex; align-items: center; margin-bottom: 12px; padding: 8px 0; border-bottom: 1px dashed #fecdd3;
+        }
+        .input-row:last-child { border-bottom: none; }
+        .input-label { width: 35%; font-size: 17px; font-weight: bold; color: var(--primary-color); display: flex; flex-direction: column; }
+        .input-subtext { font-size: 12px; color: #64748b; font-weight: normal; margin-top: 2px; }
+        
+        .input-field-group { flex: 1; display: flex; gap: 10px; align-items: center; }
+        .text-input {
+            flex: 1; padding: 10px 15px; border: 2px solid #e2e8f0; border-radius: 12px;
+            font-family: 'Cairo', sans-serif; font-size: 16px; background: #fff; transition: 0.3s;
+        }
+        .text-input:focus { border-color: var(--secondary-color); outline: none; box-shadow: 0 0 10px rgba(249, 115, 22, 0.2); }
+        .text-input[readonly] { background: #f8fafc; border-color: #cbd5e1; color: #475569; font-weight: bold; border-style: dashed; }
+
+        /* زر المايكروفون */
+        .mic-btn {
+            background: #fff1f2; border: 2px solid #fda4af; border-radius: 12px;
+            cursor: pointer; font-size: 20px; width: 45px; height: 45px;
+            display: flex; align-items: center; justify-content: center; transition: all 0.3s; flex-shrink: 0;
+        }
+        .mic-btn:hover { background: #fecdd3; transform: scale(1.05); }
+        .mic-btn.recording { background: #fee2e2; border-color: #fca5a5; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { transform: scale(1); } }
+
+        /* الأزرار السفلية */
+        .buttons-container { display: flex; gap: 15px; margin-top: 30px; justify-content: center; flex-wrap: wrap; width: 100%; max-width: 900px;}
+        .btn { font-family: 'Cairo', sans-serif; font-size: 16px; font-weight: bold; padding: 14px 30px; border: none; border-radius: 12px; cursor: pointer; color: var(--white); transition: 0.3s; display: flex; align-items: center; gap: 8px; }
+        .btn-story { background: var(--btn-grad-1); box-shadow: 0 6px 20px rgba(244, 63, 94, 0.3); }
+        .btn-download { background: var(--btn-grad-2); box-shadow: 0 6px 20px rgba(249, 115, 22, 0.3); }
+        .btn-clear { background: var(--btn-clear-grad); }
+        .btn:hover { transform: translateY(-3px); filter: brightness(1.1); }
+
+        /* نافذة القصيدة النهائية المنسقة (Modal) */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .modal-content { background: #fff; padding: 30px; border-radius: 24px; max-width: 650px; width: 90%; position: relative; text-align: right; box-shadow: 0 20px 45px rgba(0,0,0,0.2); }
+        .close-modal { position: absolute; top: 15px; left: 15px; font-size: 32px; font-weight: bold; cursor: pointer; color: #94a3b8; transition: 0.2s;}
+        
+        .result-card {
+            background-color: #fffaf0; border: 8px double var(--secondary-color); padding: 40px; 
+            border-radius: 20px; margin-top: 15px; position: relative; overflow: hidden; text-align: center;
+        }
+        .result-title { color: var(--primary-color); border-bottom: 2px dashed #fed7aa; padding-bottom: 15px; margin-top: 0; font-size: 32px;}
+        
+        .stanza-display { font-size: 20px; line-height: 2.2; color: #333; margin-bottom: 25px; font-weight: bold; }
+        .highlight-word { color: var(--primary-color); border-bottom: 2px solid #fecdd3; padding: 0 4px;}
+        .author-name { font-size: 18px; color: #64748b; font-style: italic; margin-top: -10px; margin-bottom: 25px; }
+
+        @media (max-width: 768px) {
+            .input-row { flex-direction: column; align-items: stretch; gap: 8px; border-bottom: 2px solid #fecdd3; padding-bottom: 15px;}
+            .input-label { width: 100%; flex-direction: row; align-items: center; gap: 8px;}
+            .input-subtext { margin-top: 0; }
+            .worksheet-content { padding: 30px 15px; }
+            .stanza-display { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="emoji-gallery">
+        <div class="emoji-btn active" onclick="selectEmojiBorder('none', this)">❌</div>
+        <div class="emoji-btn" onclick="selectEmojiBorder('✍️', this)">✍️</div>
+        <div class="emoji-btn" onclick="selectEmojiBorder('🌟', this)">🌟</div>
+        <div class="emoji-btn" onclick="selectEmojiBorder('🎨', this)">🎨</div>
+        <div class="emoji-btn" onclick="selectEmojiBorder('🌈', this)">🌈</div>
+        <div class="emoji-btn" onclick="selectEmojiBorder('🎭', this)">🎭</div>
+        <div class="emoji-btn" onclick="selectEmojiBorder('🦋', this)">🦋</div>
+        <div class="emoji-btn" onclick="selectEmojiBorder('🌸', this)">🌸</div>
+        <div class="emoji-btn" onclick="selectEmojiBorder('💡', this)">💡</div>
+    </div>
+
+    <div class="toolbar">
+        <label>لون الخلفية:</label> <input type="color" id="bgColor" value="#fff1f2">
+        <label>لون النص:</label> <input type="color" id="textColor" value="#334155">
+        <label>نوع الخط:</label>
+        <select id="fontStyle">
+            <option value="'Cairo', sans-serif">Cairo</option>
+            <option value="'Tahoma', sans-serif">Tahoma</option>
+        </select>
+        <label>حجم الإطار:</label> <input type="range" id="emojiSizeInput" min="16" max="36" value="26">
+    </div>
+
+    <div id="captureArea" class="capture-area">
+        <div class="emoji-border-container border-top" id="borderTop"></div>
+        <div class="emoji-border-container border-bottom" id="borderBottom"></div>
+        <div class="emoji-border-container border-left" id="borderLeft"></div>
+        <div class="emoji-border-container border-right" id="borderRight"></div>
+
+        <div class="worksheet-content">
+            <div class="header-banner">
+                <h1>قصيدة: هذا أنا ✍️</h1>
+                <p id="subTitle">اكتب قصيدتك الخاصة والفريدة لتخبر العالم من أنت يا بطل!</p>
+            </div>
+            
+            <div class="gender-selector-container">
+                <label style="font-weight: bold; font-size: 18px; color: var(--primary-color);">من أنت؟</label>
+                <button type="button" id="genderBoy" class="gender-btn active" onclick="selectGender('boy')">👦 شاعر بطل</button>
+                <button type="button" id="genderGirl" class="gender-btn" onclick="selectGender('girl')">👧 شاعرة بطلة</button>
+                <input type="hidden" id="selectedGender" value="boy">
+            </div>
+
+            <div style="text-align: center; margin-bottom: 20px;">
+                <input type="text" id="authorName" class="text-input required-field" placeholder="اكتب اسمك هنا (اسم الشاعر)" style="width: 60%; max-width: 400px; text-align: center; font-size: 18px; border-color: var(--secondary-color);">
+            </div>
+
+            <!-- المقطع الأول -->
+            <div class="stanza-card">
+                <div class="stanza-title">المقطع الأول</div>
+                <div class="input-row">
+                    <div class="input-label">أنا... <span class="input-subtext" id="sub_am1">(صفتين مميزتين فيك)</span></div>
+                    <div class="input-field-group">
+                        <input type="text" class="text-input required-field" id="i_am_1" placeholder="مثال: ذكي ومحب للاستكشاف" oninput="syncFirstLine()">
+                        <button class="mic-btn" onclick="startDictation('i_am_1', this)">🎙️</button>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-label">أتساءل عن... <span class="input-subtext">(شيء يثير فضولك)</span></div>
+                    <div class="input-field-group">
+                        <input type="text" class="text-input required-field" id="i_wonder" placeholder="مثال: كيف تطير الطيور">
+                        <button class="mic-btn" onclick="startDictation('i_wonder', this)">🎙️</button>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-label">أسمع... <span class="input-subtext">(صوت خيالي أو تحبه)</span></div>
+                    <div class="input-field-group">
+                        <input type="text" class="text-input required-field" id="i_hear" placeholder="مثال: أمواج البحر الهادئة">
+                        <button class="mic-btn" onclick="startDictation('i_hear', this)">🎙️</button>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-label">أرى... <span class="input-subtext">(مشهد خيالي أو جميل)</span></div>
+                    <div class="input-field-group">
+                        <input type="text" class="text-input required-field" id="i_see" placeholder="مثال: نجوماً تلمع في السماء">
+                        <button class="mic-btn" onclick="startDictation('i_see', this)">🎙️</button>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-label">أريد أن... <span class="input-subtext">(أمنية حقيقية)</span></div>
+                    <div class="input-field-group">
+                        <input type="text" class="text-input required-field" id="i_want" placeholder="مثال: أصبح عالماً كبيراً">
+                        <button class="mic-btn" onclick="startDictation('i_want', this)">🎙️</button>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-label">أنا... <span class="input-subtext">(يتكرر السطر الأول تلقائياً)</span></div>
+                    <div class="input-field-group">
+                        <input type="text" class="text-input" id="i_am_repeat_1" readonly placeholder="سيكتب تلقائياً هنا 🪄">
+                    </div>
+                </div>
+            </div>
+
+            <!-- المقطع الثاني -->
+            <div class="stanza-card" style="border-color: #ffedd5;">
+                <div class="stanza-title" style="background: var(--primary-color);">المقطع الثاني</div>
+                <div class="input-row">
+                    <div class="input-label">أتخيل أنني... <span class="input-subtext">(شيء تتخيل فعله)</span></div>
+                    <div class="input-field-group">
+                        <input type="text" class="text-input required-field" id="i_pretend" placeholder="مثال: أستكشف الفضاء البعيد">
+                        <button class="mic-btn" onclick="startDictation('i_pretend', this)">🎙️</button>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-label">أشعر بـ... <span class="input-subtext">(شعورك تجاه شيء خيالي)</span></div>
+                    <div class="input-field-group">
+                        <input type="text" class="text-input required-field" id="i_feel" placeholder="مثال: السعادة عندما ألمس الغيوم">
+                        <button class="mic-btn" onclick="startDictation('i_feel', this)">🎙️</button>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-label">ألمس... <span class="input-subtext">(شيء خيالي تلمسه)</span></div>
+                    <div class="input-field-group">
+                        <input type="text" class="text-input required-field" id="i_touch" placeholder="مثال: قوس قزح الملون">
+                        <button class="mic-btn" onclick="startDictation('i_touch', this)">🎙️</button>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-label">أقلق عندما... <span class="input-subtext">(شيء يزعجك)</span></div>
+                    <div class="input-field-group">
+                        <input type="text" class="text-input required-field" id="i_worry" placeholder="مثال: أرى صديقي حزيناً">
+                        <button class="mic-btn" onclick="startDictation('i_worry', this)">🎙️</button>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-label">أبكي عندما... <span class="input-subtext" id="sub_cry">(شيء يجعلك حزيناً)</span></div>
+                    <div class="input-field-group">
+                        <input type="text" class="text-input required-field" id="i_cry" placeholder="مثال: تضيع لعبتي المفضلة">
+                        <button class="mic-btn" onclick="startDictation('i_cry', this)">🎙️</button>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-label">أنا... <span class="input-subtext">(يتكرر السطر الأول تلقائياً)</span></div>
+                    <div class="input-field-group">
+                        <input type="text" class="text-input" id="i_am_repeat_2" readonly placeholder="سيكتب تلقائياً هنا 🪄">
+                    </div>
+                </div>
+            </div>
+
+            <!-- المقطع الثالث -->
+            <div class="stanza-card" style="border-color: #e0f2fe;">
+                <div class="stanza-title" style="background: #0ea5e9;">المقطع الثالث (الخاتمة)</div>
+                <div class="input-row">
+                    <div class="input-label">أفهم أن... <span class="input-subtext">(حقيقة تؤمن بها)</span></div>
+                    <div class="input-field-group">
+                        <input type="text" class="text-input required-field" id="i_understand" placeholder="مثال: التعلم يحتاج إلى صبر">
+                        <button class="mic-btn" onclick="startDictation('i_understand', this)">🎙️</button>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-label">أقول دائماً... <span class="input-subtext">(عبارتك المفضلة)</span></div>
+                    <div class="input-field-group">
+                        <input type="text" class="text-input required-field" id="i_say" placeholder="مثال: غداً أجمل بكثير">
+                        <button class="mic-btn" onclick="startDictation('i_say', this)">🎙️</button>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-label">أحلم بـ... <span class="input-subtext">(حلمك للمستقبل)</span></div>
+                    <div class="input-field-group">
+                        <input type="text" class="text-input required-field" id="i_dream" placeholder="مثال: عالم مليء بالسلام">
+                        <button class="mic-btn" onclick="startDictation('i_dream', this)">🎙️</button>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-label">أحاول أن... <span class="input-subtext" id="sub_try">(شيء تبذل فيه جهداً)</span></div>
+                    <div class="input-field-group">
+                        <input type="text" class="text-input required-field" id="i_try" placeholder="مثال: أساعد من يحتاجني">
+                        <button class="mic-btn" onclick="startDictation('i_try', this)">🎙️</button>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-label">آمل أن... <span class="input-subtext">(أمنية عظيمة)</span></div>
+                    <div class="input-field-group">
+                        <input type="text" class="text-input required-field" id="i_hope" placeholder="مثال: أحقق كل طموحاتي">
+                        <button class="mic-btn" onclick="startDictation('i_hope', this)">🎙️</button>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-label">أنا... <span class="input-subtext">(يتكرر السطر الأول تلقائياً)</span></div>
+                    <div class="input-field-group">
+                        <input type="text" class="text-input" id="i_am_repeat_3" readonly placeholder="سيكتب تلقائياً هنا 🪄">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="buttons-container">
+        <button class="btn btn-story" onclick="generatePoem()">✨ إصدار قصيدتي الفنية</button>
+        <button class="btn btn-download" onclick="downloadPage()">📸 تحميل الورقة فارغة</button>
+        <button class="btn btn-clear" onclick="clearAll()">🧹 امسح الكل</button>
+    </div>
+
+    <!-- نافذة القصيدة النهائية -->
+    <div id="poemModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            
+            <div id="resultCaptureArea" class="result-card">
+                <div class="emoji-border-container border-top" id="resBorderTop" style="top: 8px;"></div>
+                <div class="emoji-border-container border-bottom" id="resBorderBottom" style="bottom: 8px;"></div>
+                <div class="emoji-border-container border-left" id="resBorderLeft" style="top: 35px; bottom: 35px; left: 10px;"></div>
+                <div class="emoji-border-container border-right" id="resBorderRight" style="top: 35px; bottom: 35px; right: 10px;"></div>
+
+                <h2 class="result-title">هذا أنا</h2>
+                <div class="author-name" id="displayAuthorName">بقلم: </div>
+                
+                <div class="stanza-display">
+                    أنا <span class="highlight-word" id="out_am1"></span><br>
+                    أتساءل عن <span class="highlight-word" id="out_wonder"></span><br>
+                    أسمع <span class="highlight-word" id="out_hear"></span><br>
+                    أرى <span class="highlight-word" id="out_see"></span><br>
+                    أريد أن <span class="highlight-word" id="out_want"></span><br>
+                    أنا <span class="highlight-word" id="out_am_r1"></span>
+                </div>
+
+                <div class="stanza-display">
+                    أتخيل أنني <span class="highlight-word" id="out_pretend"></span><br>
+                    أشعر بـ <span class="highlight-word" id="out_feel"></span><br>
+                    ألمس <span class="highlight-word" id="out_touch"></span><br>
+                    أقلق عندما <span class="highlight-word" id="out_worry"></span><br>
+                    أبكي عندما <span class="highlight-word" id="out_cry"></span><br>
+                    أنا <span class="highlight-word" id="out_am_r2"></span>
+                </div>
+
+                <div class="stanza-display" style="margin-bottom: 0;">
+                    أفهم أن <span class="highlight-word" id="out_understand"></span><br>
+                    أقول دائماً <span class="highlight-word" id="out_say"></span><br>
+                    أحلم بـ <span class="highlight-word" id="out_dream"></span><br>
+                    أحاول أن <span class="highlight-word" id="out_try"></span><br>
+                    آمل أن <span class="highlight-word" id="out_hope"></span><br>
+                    أنا <span class="highlight-word" id="out_am_r3"></span>
+                </div>
+            </div>
+            
+            <div style="display: flex; justify-content: center; margin-top: 20px; gap: 15px;">
+                <button class="btn btn-download" style="background: linear-gradient(135deg, #8b5cf6, #6366f1);" onclick="copyPoem()">📋 نسخ القصيدة</button>
+                <button class="btn btn-story" onclick="downloadResult()">📸 حفظ كصورة</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const root = document.documentElement;
+        let activeEmoji = 'none';
+
+        // دالة مزامنة السطر الأول مع باقي المقاطع
+        function syncFirstLine() {
+            const val = document.getElementById('i_am_1').value;
+            document.getElementById('i_am_repeat_1').value = val;
+            document.getElementById('i_am_repeat_2').value = val;
+            document.getElementById('i_am_repeat_3').value = val;
+        }
+
+        // دالة الجنس وتحديث النصوص
+        function selectGender(gender) {
+            document.getElementById('genderBoy').classList.remove('active');
+            document.getElementById('genderGirl').classList.remove('active');
+            
+            if (gender === 'boy') {
+                document.getElementById('genderBoy').classList.add('active');
+                document.getElementById('selectedGender').value = 'boy';
+                document.getElementById('subTitle').innerText = 'اكتب قصيدتك الخاصة والفريدة لتخبر العالم من أنت يا بطل!';
+                document.getElementById('sub_am1').innerText = '(صفتين مميزتين فيك)';
+                document.getElementById('sub_cry').innerText = '(شيء يجعلك حزيناً)';
+                document.getElementById('sub_try').innerText = '(شيء تبذل فيه جهداً)';
+                document.getElementById('i_am_1').placeholder = 'مثال: ذكي ومحب للاستكشاف';
+            } else {
+                document.getElementById('genderGirl').classList.add('active');
+                document.getElementById('selectedGender').value = 'girl';
+                document.getElementById('subTitle').innerText = 'اكتبي قصيدتكِ الخاصة والفريدة لتخبري العالم من أنتِ يا بطلة!';
+                document.getElementById('sub_am1').innerText = '(صفتين مميزتين فيكِ)';
+                document.getElementById('sub_cry').innerText = '(شيء يجعلكِ حزينة)';
+                document.getElementById('sub_try').innerText = '(شيء تبذلين فيه جهداً)';
+                document.getElementById('i_am_1').placeholder = 'مثال: ذكية ومحبة للاستكشاف';
+            }
+        }
+
+        // بناء الإطارات
+        function renderEmojiBorder() {
+            const containers = [
+                { top: 'borderTop', bottom: 'borderBottom', left: 'borderLeft', right: 'borderRight', area: document.getElementById('captureArea'), scale: 30 },
+                { top: 'resBorderTop', bottom: 'resBorderBottom', left: 'resBorderLeft', right: 'resBorderRight', area: document.getElementById('resultCaptureArea'), scale: 16 }
+            ];
+
+            containers.forEach(c => {
+                document.getElementById(c.top).innerHTML = ''; document.getElementById(c.bottom).innerHTML = '';
+                document.getElementById(c.left).innerHTML = ''; document.getElementById(c.right).innerHTML = '';
+
+                if (activeEmoji === 'none') return;
+                const emojiSize = parseInt(getComputedStyle(root).getPropertyValue('--emoji-size')) || 26;
+                const spacing = emojiSize + 10; 
+                const cols = Math.floor((c.area.offsetWidth - c.scale) / spacing); const rows = Math.floor((c.area.offsetHeight - (c.scale * 2)) / spacing);
+
+                for (let i = 0; i < cols; i++) {
+                    document.getElementById(c.top).innerHTML += `<span class="emoji-item">${activeEmoji}</span>`; document.getElementById(c.bottom).innerHTML += `<span class="emoji-item">${activeEmoji}</span>`;
+                }
+                for (let i = 0; i < rows; i++) {
+                    document.getElementById(c.left).innerHTML += `<span class="emoji-item">${activeEmoji}</span>`; document.getElementById(c.right).innerHTML += `<span class="emoji-item">${activeEmoji}</span>`;
+                }
+            });
+        }
+
+        function selectEmojiBorder(emoji, element) {
+            document.querySelectorAll('.emoji-gallery .emoji-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active'); activeEmoji = emoji; renderEmojiBorder();
+        }
+
+        window.addEventListener('resize', renderEmojiBorder);
+        
+        // أدوات التصميم
+        document.getElementById('bgColor').addEventListener('input', e => root.style.setProperty('--bg-pastel', e.target.value));
+        document.getElementById('textColor').addEventListener('input', e => root.style.setProperty('--text-color', e.target.value));
+        document.getElementById('fontStyle').addEventListener('change', e => { 
+            document.getElementById('captureArea').style.fontFamily = e.target.value; 
+            document.getElementById('resultCaptureArea').style.fontFamily = e.target.value; 
+        });
+        document.getElementById('emojiSizeInput').addEventListener('input', e => { root.style.setProperty('--emoji-size', e.target.value + 'px'); renderEmojiBorder(); });
+
+        // توليد القصيدة
+        function generatePoem() {
+            let isComplete = true;
+            document.querySelectorAll('.required-field').forEach(input => {
+                if(input.value.trim() === '') isComplete = false;
+            });
+
+            if(!isComplete) {
+                const isBoy = document.getElementById('selectedGender').value === 'boy';
+                Swal.fire('أكمل الإبداع!', `يرجى ملء جميع الفراغات لنتمكن من كتابة قصيدتك ${isBoy?'أيها الشاعر':'أيتها الشاعرة'}.`, 'warning');
+                return;
+            }
+
+            // نقل القيم إلى المودال
+            document.getElementById('displayAuthorName').innerText = `بقلم: ${document.getElementById('authorName').value}`;
+            
+            const fieldsToMap = ['i_am_1', 'i_wonder', 'i_hear', 'i_see', 'i_want', 'i_pretend', 'i_feel', 'i_touch', 'i_worry', 'i_cry', 'i_understand', 'i_say', 'i_dream', 'i_try', 'i_hope'];
+            fieldsToMap.forEach(f => {
+                document.getElementById(`out_${f.replace('i_','')}`).innerText = document.getElementById(f).value;
+            });
+            
+            // السطور المتكررة
+            const firstLine = document.getElementById('i_am_1').value;
+            document.getElementById('out_am_r1').innerText = firstLine;
+            document.getElementById('out_am_r2').innerText = firstLine;
+            document.getElementById('out_am_r3').innerText = firstLine;
+
+            document.getElementById('poemModal').style.display = 'flex';
+            setTimeout(renderEmojiBorder, 50);
+        }
+
+        function closeModal() { document.getElementById('poemModal').style.display = 'none'; }
+
+        // نسخ القصيدة كنص
+        function copyPoem() {
+            let poemText = "هذا أنا\n\n";
+            poemText += `أنا ${document.getElementById('i_am_1').value}\n`;
+            poemText += `أتساءل عن ${document.getElementById('i_wonder').value}\n`;
+            poemText += `أسمع ${document.getElementById('i_hear').value}\n`;
+            poemText += `أرى ${document.getElementById('i_see').value}\n`;
+            poemText += `أريد أن ${document.getElementById('i_want').value}\n`;
+            poemText += `أنا ${document.getElementById('i_am_1').value}\n\n`;
+            
+            poemText += `أتخيل أنني ${document.getElementById('i_pretend').value}\n`;
+            poemText += `أشعر بـ ${document.getElementById('i_feel').value}\n`;
+            poemText += `ألمس ${document.getElementById('i_touch').value}\n`;
+            poemText += `أقلق عندما ${document.getElementById('i_worry').value}\n`;
+            poemText += `أبكي عندما ${document.getElementById('i_cry').value}\n`;
+            poemText += `أنا ${document.getElementById('i_am_1').value}\n\n`;
+
+            poemText += `أفهم أن ${document.getElementById('i_understand').value}\n`;
+            poemText += `أقول دائماً ${document.getElementById('i_say').value}\n`;
+            poemText += `أحلم بـ ${document.getElementById('i_dream').value}\n`;
+            poemText += `أحاول أن ${document.getElementById('i_try').value}\n`;
+            poemText += `آمل أن ${document.getElementById('i_hope').value}\n`;
+            poemText += `أنا ${document.getElementById('i_am_1').value}\n`;
+
+            navigator.clipboard.writeText(poemText).then(() => {
+                Swal.fire('تم النسخ!', 'تم نسخ القصيدة بنجاح، يمكنك لصقها الآن.', 'success');
+            });
+        }
+
+        // الإملاء الصوتي
+        function startDictation(inputId, btn) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                Swal.fire('عذراً!', 'متصفحك لا يدعم الإملاء الصوتي.', 'error'); return;
+            }
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'ar-SA'; recognition.interimResults = false;
+            
+            recognition.onstart = function() { btn.classList.add('recording'); };
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                const input = document.getElementById(inputId);
+                input.value = input.value.trim() !== '' ? input.value + ' ' + transcript : transcript;
+                if(inputId === 'i_am_1') syncFirstLine(); // تحديث فوري إذا تم التحدث بالسطر الأول
+            };
+            recognition.onend = function() { btn.classList.remove('recording'); };
+            recognition.onerror = function(event) {
+                btn.classList.remove('recording');
+                if (event.error === 'not-allowed') {
+                    Swal.fire('تنبيه أمان', 'المتصفح يمنع تشغيل المايكروفون. يرجى إعطاء الصلاحية.', 'info');
+                }
+            };
+            try { recognition.start(); } catch (err) {}
+        }
+
+        // التحميل والصور
+        function downloadPage() {
+            html2canvas(document.getElementById('captureArea'), { scale: 2 }).then(canvas => {
+                const link = document.createElement('a'); link.download = 'ورقة_قصيدتي.png'; link.href = canvas.toDataURL(); link.click();
+            });
+        }
+        function downloadResult() {
+            html2canvas(document.getElementById('resultCaptureArea'), { scale: 2 }).then(canvas => {
+                const link = document.createElement('a'); link.download = 'قصيدة_هذا_أنا.png'; link.href = canvas.toDataURL(); link.click();
+            });
+        }
+        
+        function clearAll() {
+            document.querySelectorAll('.required-field').forEach(input => input.value = '');
+            document.querySelectorAll('input[readonly]').forEach(input => input.value = '');
+            Swal.fire('تم المسح! ✨', 'الورقة جاهزة لإبداع جديد.', 'success');
+        }
+    </script>
+</body>
+</html>
