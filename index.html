@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -29,7 +28,7 @@
             position: relative;
         }
 
-        /* حاوية الأكفاريوم (الأسماك والفقاعات الخلفية) */
+        /* حاوية الأكفاريوم (الأسماك والفقاعات الخلفية الثابتة) */
         .aquarium {
             position: fixed;
             top: 0;
@@ -49,10 +48,10 @@
         .fish-ltr { animation: swimLTR linear infinite; transform: scaleX(-1); }
 
         /* حجم الأسماك الأفقية الكبيرة وسرعة حركتها في الأسفل */
-        .f1 { bottom: 10%; animation-duration: 25s; font-size: 80px; }
-        .f2 { bottom: 25%; animation-duration: 35s; font-size: 70px; animation-delay: 5s; }
-        .f3 { bottom: 15%; animation-duration: 28s; font-size: 90px; animation-delay: 2s; }
-        .f5 { bottom: 20%; animation-duration: 30s; font-size: 85px; animation-delay: 15s; }
+        .f1 { bottom: 20%; animation-duration: 25s; font-size: 80px; }
+        .f2 { bottom: 35%; animation-duration: 35s; font-size: 70px; animation-delay: 5s; }
+        .f3 { bottom: 25%; animation-duration: 28s; font-size: 90px; animation-delay: 2s; }
+        .f5 { bottom: 30%; animation-duration: 30s; font-size: 85px; animation-delay: 15s; }
         
         /* حركة تصاعد فقاعات الماء */
         .b1 { left: 10%; bottom: -5%; animation-duration: 8s; animation-delay: 0s; font-size: 20px;}
@@ -66,13 +65,13 @@
             user-select: none;
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
             animation: floatUpDown ease-in-out infinite;
-            pointer-events: none; /* لمنع حجب إمكانية الضغط على الكروت */
+            pointer-events: none; 
         }
         
         /* الأخطبوط يسبح بهدوء في الخلفية اليسرى */
         .v1 { left: 15%; bottom: -10%; animation-duration: 20s; font-size: 75px; z-index: 0;} 
         
-        /* قنديل البحر الرائع يطفو في منتصف الشاشة وفوق البطاقات مباشرة لمزيد من التفاعل */
+        /* قنديل البحر الرائع يطفو في منتصف الشاشة وفوق البطاقات مباشرة لمزيد من التفاعل البصري */
         .v2 { 
             left: 50%; 
             transform: translateX(-50%);
@@ -80,23 +79,37 @@
             animation-duration: 22s; 
             font-size: 85px; 
             animation-delay: 2s; 
-            z-index: 50; /* يجعله يمر فوق محتوى الصفحة */
+            z-index: 50; 
         } 
 
-        /* --- كائنات قاع البحر النابضة بالتنفس --- */
+        /* --- حاوية قاع الصفحة المطورة (Seabed Footer) --- */
+        .seabed-footer {
+            margin-top: 80px; 
+            width: 100%; 
+            max-width: 950px; 
+            position: relative; /* لتحديد تموضع الكائنات بداخلها بمرونة */
+            padding: 70px 20px 30px 20px; /* تباعد كافٍ لحماية النص والكائنات */
+            border-top: 2px dashed rgba(255, 255, 255, 0.3);
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* كائنات قاع البحر النابضة بالتنفس مستقرة الآن داخل الفوتر */
         .bottom-creature {
             position: absolute; 
             user-select: none; 
             animation: pulseScale 4s ease-in-out infinite; 
             z-index: 1;
         }
-        .c-crab { right: 8%; bottom: 15px; font-size: 65px; animation-delay: 0s; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15)); }
-        .c-shell { right: 20%; bottom: 5px; font-size: 55px; animation-delay: 1s; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15)); }
+        .c-crab { right: 5%; bottom: 15px; font-size: 65px; animation-delay: 0s; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15)); }
+        .c-shell { right: 18%; bottom: 5px; font-size: 55px; animation-delay: 1s; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15)); }
         
-        /* نجم البحر في أقصى اليسار مع فلتر التلوين للأحمر البني */
+        /* نجم البحر في أقصى اليسار مع فلتر التلوين للأحمر البني المطور */
         .c-star { 
-            left: 8%; 
-            bottom: 25px; 
+            left: 5%; 
+            bottom: 20px; 
             font-size: 60px; 
             animation-delay: 2s; 
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)) sepia(0.7) hue-rotate(330deg) saturate(3) brightness(0.7); 
@@ -247,27 +260,56 @@
         
         @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
-        @media (max-width: 600px) { .header h1 { font-size: 34px; } .card { padding: 30px 20px; } .fish { font-size: 55px; } }
 
         /* تصميم قسم تذييل الصفحة الخاص بحقوق البرمجة ونسبها إليكِ بنجاح */
         .site-footer {
-            margin-top: 60px; 
             text-align: center; 
             color: #f0f9ff; 
-            font-size: 18px; 
+            font-size: 19px; 
             font-weight: bold;
             text-shadow: 0 2px 4px rgba(0,0,0,0.2); 
-            padding: 20px; 
-            border-top: 1px dashed rgba(255, 255, 255, 0.3);
-            width: 100%; 
-            max-width: 800px;
+            z-index: 2; /* لتكون فوق الكائنات وتسهل قراءتها */
         }
         .site-footer span { color: #fef08a; }
+
+        @media (max-width: 600px) { 
+            .header h1 { font-size: 34px; } 
+            .card { padding: 30px 20px; } 
+            .fish { font-size: 55px; } 
+            
+            /* تصغير كائنات القاع في الجوال لكي لا تغطي على النص بشكل غير مرتب */
+            .c-crab { font-size: 45px; right: 2%; bottom: 10px; }
+            .c-shell { font-size: 35px; right: 15%; bottom: 5px; }
+            .c-star { font-size: 40px; left: 2%; bottom: 12px; }
+            .seabed-footer { padding: 50px 10px 20px 10px; margin-top: 40px; }
+            .site-footer { font-size: 15px; }
+        }
+
+        /* تنبيه مخصص مدمج بالصفحة لشريط الإعلانات أو الأخطراء لتجنب استخدام alert() */
+        .custom-toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(15, 23, 42, 0.9);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: bold;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            z-index: 2000;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+            font-size: 15px;
+        }
+        .custom-toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
     </style>
 </head>
 <body>
 
-    <!-- حوض الأسماك والبيئة المائية الخلفية -->
+    <!-- حوض الأسماك والبيئة المائية الخلفية (فقط الأسماك والفقاعات العائمة) -->
     <div class="aquarium">
         <div class="bubble b1">🫧</div><div class="bubble b2">🫧</div><div class="bubble b3">🫧</div><div class="bubble b4">🫧</div>
         
@@ -276,11 +318,6 @@
         <div class="fish fish-ltr f2">🐟</div>
         <div class="fish fish-rtl f3">🐡</div>
         <div class="fish fish-ltr f5">🐠</div> 
-        
-        <!-- كائنات القاع الساحلية النابضة بهدوء -->
-        <div class="bottom-creature c-crab" title="سلطعون">🦀</div>
-        <div class="bottom-creature c-shell" title="صدفة">🐚</div>
-        <div class="bottom-creature c-star" title="نجم بحر">⭐</div>
     </div>
 
     <!-- كائنات تسبح بشكل عمودي (مستقلة عن الأكفاريوم للتحكم بالواجهة والأسبقية البصرية) -->
@@ -298,6 +335,9 @@
         🔊 تشغيل صوت البحر
     </button>
 
+    <!-- تنبيه مخصص للرسائل بدون استخدام alert() المزعج -->
+    <div class="custom-toast" id="customToast">يرجى تشغيل الصوت من جهازك أولاً 🔊</div>
+
     <!-- المحتوى الفعلي المنسق للموقع -->
     <div class="content-wrapper">
         <div class="header">
@@ -308,7 +348,7 @@
 
         <div class="cards-grid">
             <!-- الكرت الأول: معلوماتي الشخصية -->
-            <a href="personal_info.html" class="card">
+            <a href="https://nadosh.github.io/matia-tools/personal_info.html" target="_blank" class="card">
                 <div class="card-icon-wrapper">🧮</div>
                 <h2 class="card-title">معلوماتي الشخصية</h2>
                 <p class="card-desc">استخدم سحر الرياضيات والأرقام لتحكي قصة روتينك اليومي وتصنع بطاقة حظك السحرية.</p>
@@ -316,7 +356,7 @@
             </a>
             
             <!-- الكرت الثاني: مشاعري المدرسية -->
-            <a href="school_feelings.html" class="card">
+            <a href="https://nadosh.github.io/matia-tools/school_feelings.html" target="_blank" class="card">
                 <div class="card-icon-wrapper">🎒</div>
                 <h2 class="card-title">مشاعري المدرسية</h2>
                 <p class="card-desc">كيف تشعر تجاه المدرسة؟ اختر الرموز التعبيرية واصنع لوحة مشاعرك الخاصة بكل حرية.</p>
@@ -324,7 +364,7 @@
             </a>
             
             <!-- الكرت الثالث: كل شيء عني -->
-            <a href="all_about_me.html" class="card">
+            <a href="https://nadosh.github.io/matia-tools/all_about_me.html" target="_blank" class="card">
                 <div class="card-icon-wrapper">🌟</div>
                 <h2 class="card-title">كل شيء عني</h2>
                 <p class="card-desc">أخبرنا عن طعامك المفضل، هواياتك، وأسرارك الطريفة لننسج معاً قصتك النثرية المترابطة.</p>
@@ -332,7 +372,7 @@
             </a>
             
             <!-- الكرت الرابع: قصيدة هذا أنا -->
-            <a href="i_am_poem.html" class="card">
+            <a href="https://nadosh.github.io/matia-tools/i_am_poem.html" target="_blank" class="card">
                 <div class="card-icon-wrapper">✍️</div>
                 <h2 class="card-title">قصيدة: هذا أنا</h2>
                 <p class="card-desc">نشاط أدبي رائع. أطلق العنان لمخيلتك، وعبر عن أحلامك ومخاوفك في قصيدة فنية جميلة.</p>
@@ -340,17 +380,33 @@
             </a>
         </div>
 
-        <!-- تذييل الموقع بتوقيعك الرائع والمميز -->
-        <div class="site-footer">
-            تطوير وبرمجة <span>ناديا الحاج</span> لصالح مؤسسة <span>ماتيا الجليل</span>
+        <!-- تذييل الصفحة المطور (Seabed) حيث ترسو الكائنات مع اسمكِ الرائع -->
+        <div class="seabed-footer">
+            <!-- كائنات القاع الساحلية النابضة بهدوء وتأثير الـ 3D -->
+            <div class="bottom-creature c-crab" title="سلطعون">🦀</div>
+            <div class="bottom-creature c-shell" title="صدفة">🐚</div>
+            <div class="bottom-creature c-star" title="نجم بحر">⭐</div>
+
+            <div class="site-footer">
+                تطوير وبرمجة <span>ناديا الحاج</span> لصالح مؤسسة <span>ماتيا الجليل</span>
+            </div>
         </div>
     </div>
 
-    <!-- أكواد جافاسكريبت للتحكم بالصوت -->
+    <!-- أكواد جافاسكريبت للتحكم بالصوت والتنبيه المخصص -->
     <script>
         const audio = document.getElementById('oceanAudio');
         const soundBtn = document.getElementById('soundToggleBtn');
+        const toast = document.getElementById('customToast');
         let isPlaying = false;
+
+        function showToast(message) {
+            toast.innerText = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
 
         function toggleSound() {
             if (isPlaying) {
@@ -371,7 +427,7 @@
                     })
                     .catch(error => {
                         console.error("مشكلة في تشغيل الصوت:", error);
-                        alert("عذراً! يبدو أن المتصفح يمنع تشغيل الصوت تلقائياً. تأكدي من السماح بالصوت في إعدادات متصفحك أو جهازك.");
+                        showToast("عذراً! يبدو أن متصفحك يمنع التشغيل تلقائياً. يرجى إعطاء صلاحية الصوت.");
                     });
                 }
             }
