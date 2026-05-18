@@ -1,907 +1,891 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2685.6">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مشاعري تجاه المدرسة</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        :root {
+            /* الهوية البصرية الجديدة: حيوية، منعشة، ومريحة (بدون كآبة) */
+            --primary-color: #0ea5e9; /* أزرق سماوي حيوي ومبهج */
+            --text-color: #334155;    /* رمادي داكن مزرق مريح جداً للعين للقراءة */
+            --bg-pastel: #f0f9ff;     /* خلفية سماوية فاتحة جداً كالغيوم */
+            --white: #ffffff;
+            --emoji-size: 26px;       /* حجم الإيموجي الافتراضي */
+            --content-padding: 50px;  /* حشو المحتوى الداخلي */
+            
+            /* أزرار بتدرجات حيوية لكن هادئة */
+            --btn-story-grad: linear-gradient(135deg, #10b981, #059669); /* أخضر زمردي إيجابي للنجاح */
+            --btn-download-grad: linear-gradient(135deg, #3b82f6, #2563eb); /* أزرق ملكي حيوي للتحميل */
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #f8fafc 100%);
+            margin: 0;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* صندوق الأدوات (Toolbar) */
+        .toolbar {
+            background-color: var(--white);
+            padding: 15px 25px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(14, 165, 233, 0.08);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 950px;
+            justify-content: center;
+        }
+
+        .toolbar label { 
+            font-weight: bold; 
+            color: var(--primary-color);
+            font-size: 14px;
+        }
+
+        .toolbar input, .toolbar select {
+            border: 2px solid #bae6fd;
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .toolbar input:focus, .toolbar select:focus {
+            border-color: var(--primary-color);
+        }
+
+        /* معرض إطارات الإيموجي الدائري التفاعلي (يحتوي على الرموز المدرسية والوجوه) */
+        .emoji-gallery {
+            background-color: var(--white);
+            padding: 15px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(14, 165, 233, 0.08);
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            margin-bottom: 25px;
+            width: 100%;
+            max-width: 950px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .emoji-btn {
+            width: 48px;
+            height: 48px;
+            background: #f8fafc;
+            border: 3px solid #e2e8f0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            user-select: none;
+            flex-shrink: 0;
+        }
+
+        .emoji-btn:hover { 
+            transform: scale(1.15) translateY(-2px);
+            box-shadow: 0 5px 15px rgba(14, 165, 233, 0.15);
+            border-color: #7dd3fc;
+        }
+
+        .emoji-btn.active { 
+            border-color: #f59e0b; 
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.5);
+            background: #fff;
+            transform: scale(1.1);
+        }
+
+        /* منطقة ورقة العمل التفاعلية المتسعة والمؤطرة */
+        .capture-area {
+            background-color: var(--bg-pastel);
+            color: var(--text-color); 
+            border-radius: 24px;
+            width: 100%;
+            max-width: 950px; 
+            box-shadow: 0 15px 35px rgba(14, 165, 233, 0.1);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* حاويات الإطارات الأربعة الدائرية */
+        .emoji-border-container {
+            position: absolute;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        .border-top { top: 12px; left: 15px; right: 15px; height: 35px; flex-direction: row; }
+        .border-bottom { bottom: 12px; left: 15px; right: 15px; height: 35px; flex-direction: row; }
+        .border-left { top: 50px; bottom: 50px; left: 15px; width: 35px; flex-direction: column; }
+        .border-right { top: 50px; bottom: 50px; right: 15px; width: 35px; flex-direction: column; }
+
+        .emoji-item {
+            font-size: var(--emoji-size);
+            line-height: 1;
+            transition: font-size 0.2s;
+        }
+
+        /* المحتوى الداخلي للورقة التفاعلية */
+        .worksheet-content {
+            padding: var(--content-padding);
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        /* لافتة العنوان الفاخرة (Header Banner) */
+        .header-banner {
+            background: linear-gradient(135deg, var(--primary-color), #0284c7);
+            color: var(--white);
+            padding: 25px;
+            border-radius: 18px;
+            text-align: center;
+            margin-bottom: 25px;
+            box-shadow: 0 6px 18px rgba(14, 165, 233, 0.25);
+        }
+
+        .header-banner h1 { margin: 0; font-size: 36px; text-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+        .header-banner p { margin: 10px 0 0 0; font-size: 16px; opacity: 0.95; font-weight: bold;}
+
+        /* أزرار اختيار الجنس التفاعلية الملونة بالباستيل */
+        .worksheet-row {
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            font-size: 17px; 
+            font-weight: bold;
+        }
+        .label-emoji {
+            font-size: 24px;
+        }
+        .gender-selector-container {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .gender-btn {
+            font-family: 'Cairo', sans-serif;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 10px 24px;
+            border: 2px solid #cbd5e1;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--white);
+            color: var(--text-color);
+        }
+
+        .gender-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .gender-btn#genderBoy {
+            background-color: #e0f2fe;
+            border-color: #bae6fd;
+            color: #0369a1;
+        }
+
+        .gender-btn#genderBoy.active {
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            color: var(--white);
+            border-color: #0284c7;
+            box-shadow: 0 6px 15px rgba(2, 132, 199, 0.35);
+        }
+
+        .gender-btn#genderGirl {
+            background-color: #fce7f3;
+            border-color: #fbcfe8;
+            color: #be185d;
+        }
+
+        .gender-btn#genderGirl.active {
+            background: linear-gradient(135deg, #db2777, #be185d);
+            color: var(--white);
+            border-color: #db2777;
+            box-shadow: 0 6px 15px rgba(219, 39, 119, 0.35);
+        }
+
+        .gender-btn .btn-gender-emoji {
+            font-size: 28px;
+        }
+
+        /* إدخال اسم الطالب بشكل مرح */
+        .student-name-box {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .student-name-box input {
+            width: 60%;
+            max-width: 400px;
+            padding: 12px 20px;
+            border: 3px dashed var(--primary-color);
+            border-radius: 15px;
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--text-color);
+            text-align: center;
+            background: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .student-name-box input:focus {
+            border-style: solid;
+            background: #fff;
+            box-shadow: 0 0 15px rgba(14, 165, 233, 0.2);
+            outline: none;
+        }
+
+        .section-card {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 18px;
+            padding: 20px 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            border: 2px solid #e0f2fe;
+        }
+
+        /* ترويسة الجدول */
+        .grid-header {
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 2fr;
+            gap: 15px;
+            font-weight: bold;
+            font-size: 18px;
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        /* صفوف المشاعر */
+        .feeling-row {
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 2fr;
+            gap: 15px;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px dashed #cbd5e1;
+            transition: background-color 0.2s;
+        }
+        .feeling-row:hover { background-color: rgba(240, 249, 255, 0.5); border-radius: 10px; }
+        .feeling-row:last-child { border-bottom: none; }
+
+        .situation-text {
+            font-size: 17px;
+            font-weight: bold;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* تصميم أزرار الإيموجي التفاعلية (الاختيار) */
+        .emoji-selector {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            background: #f8fafc;
+            padding: 8px;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .emoji-option {
+            font-size: 26px;
+            cursor: pointer;
+            filter: grayscale(100%) opacity(0.4); /* باهت جداً قبل الاختيار */
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            user-select: none;
+            padding: 4px;
+            border-radius: 50%;
+        }
+
+        .emoji-option:hover {
+            filter: grayscale(0%) opacity(1);
+            transform: scale(1.2);
+        }
+
+        .emoji-option.selected {
+            filter: grayscale(0%) opacity(1);
+            transform: scale(1.3);
+            background-color: #fef08a; /* هالة صفراء جذابة للإيموجي المختار */
+            box-shadow: 0 0 12px rgba(253, 224, 71, 0.7);
+        }
+
+        .reason-input {
+            padding: 10px 12px;
+            border: 2px solid #cbd5e1;
+            border-radius: 10px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 15px;
+            width: 100%;
+            box-sizing: border-box;
+            background: #ffffff;
+            transition: 0.3s;
+        }
+        .reason-input:focus { border-color: var(--primary-color); outline: none; box-shadow: 0 0 8px rgba(14, 165, 233, 0.2); }
+
+        /* الأزرار السفلية */
+        .buttons-container { 
+            display: flex; gap: 15px; margin-top: 30px; justify-content: center; width: 100%; max-width: 950px; flex-wrap: wrap;
+        }
+        .btn { 
+            font-family: 'Cairo', sans-serif; font-size: 16px; font-weight: bold; padding: 14px 30px; 
+            border: none; border-radius: 12px; cursor: pointer; color: var(--white); transition: 0.3s; display: flex; align-items: center; gap: 8px;
+        }
+        .btn-story { background: var(--btn-story-grad); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.25); }
+        .btn-download { background: var(--btn-download-grad); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.25); }
+        .btn-clear { background: linear-gradient(135deg, #f07167, #df4c40); box-shadow: 0 6px 20px rgba(240, 113, 103, 0.25); }
+        .btn:hover { transform: translateY(-3px); filter: brightness(1.05);}
+
+        /* نافذة توليد بطاقة المشاعر النهائية */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .modal-content { background: #fff; padding: 30px; border-radius: 24px; max-width: 750px; width: 90%; position: relative; text-align: right; box-shadow: 0 20px 45px rgba(0,0,0,0.2); }
+        .close-modal { position: absolute; top: 15px; left: 15px; font-size: 32px; font-weight: bold; cursor: pointer; color: #94a3b8; transition: 0.2s;}
+        .close-modal:hover { color: #ef4444; }
+        
+        .result-card {
+            background-color: var(--bg-pastel);
+            color: var(--text-color);
+            border: 5px double var(--primary-color); 
+            padding: 40px; 
+            border-radius: 20px; 
+            margin-top: 15px;
+            position: relative;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+        
+        .result-title { 
+            text-align: center; color: var(--primary-color); border-bottom: 2px dashed #93c5fd; padding-bottom: 15px; margin-top: 0; font-size: 28px;
+        }
+        
+        .result-item {
+            margin-bottom: 15px; font-size: 17px; line-height: 1.8; background: rgba(255,255,255,0.85); padding: 15px 20px; border-radius: 12px; border: 1px solid #e0f2fe; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; align-items: flex-start; gap: 10px;
+        }
+
+        .result-item-emoji {
+            font-size: 26px;
+            background: #fef08a;
+            border-radius: 50%;
+            padding: 4px;
+            line-height: 1;
+        }
+
+        /* --- إضافات ميزة الإملاء الصوتي --- */
+        .mic-btn {
+            background: #e0f2fe;
+            border: 2px solid #bae6fd;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 20px;
+            padding: 0 15px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .mic-btn:hover { background: #bae6fd; transform: scale(1.05); }
+        .mic-btn.recording {
+            background: #fee2e2;
+            border-color: #fca5a5;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        @media (max-width: 768px) {
+            .grid-header { display: none; } /* إخفاء الترويسة في الموبايل لضيق المساحة */
+            .feeling-row { grid-template-columns: 1fr; gap: 12px; background: #fff; padding: 20px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.03);}
+            .situation-text { text-align: center; border-bottom: 2px dashed #e2e8f0; padding-bottom: 10px; justify-content: center;}
+            .worksheet-content { padding: 30px 15px; }
+            .gender-selector-container { flex-direction: column; }
+        }
+    </style>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html lang="ar" dir="rtl"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;مشاعري تجاه المدرسة&lt;/title&gt;</p>
-<p class="p2"><span class="Apple-converted-space">    </span></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&amp;display=swap" rel="stylesheet"&gt;</p>
-<p class="p2"><span class="Apple-converted-space">    </span></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"&gt;&lt;/script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"&gt;&lt;/script&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>:root {</p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">            </span>/* الهوية البصرية الجديدة: حيوية، منعشة، ومريحة (بدون كآبة) */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--primary-color: #0ea5e9; /* أزرق سماوي حيوي ومبهج */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--text-color: #334155;<span class="Apple-converted-space">    </span>/* رمادي داكن مزرق مريح جداً للعين للقراءة */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--bg-pastel: #f0f9ff; <span class="Apple-converted-space">    </span>/* خلفية سماوية فاتحة جداً كالغيوم */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--white: #ffffff;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--emoji-size: 26px; <span class="Apple-converted-space">      </span>/* حجم الإيموجي الافتراضي */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--content-padding: 50px;<span class="Apple-converted-space">  </span>/* حشو المحتوى الداخلي */</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">            </span>/* أزرار بتدرجات حيوية لكن هادئة */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--btn-story-grad: linear-gradient(135deg, #10b981, #059669); /* أخضر زمردي إيجابي للنجاح */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--btn-download-grad: linear-gradient(135deg, #3b82f6, #2563eb); /* أزرق ملكي حيوي للتحميل */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>body {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Cairo', sans-serif;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: linear-gradient(135deg, #e0f2fe 0%, #f8fafc 100%);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 30px 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex-direction: column;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>min-height: 100vh;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">        </span>/* صندوق الأدوات (Toolbar) */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.toolbar {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: var(--white);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 15px 25px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 16px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 8px 20px rgba(14, 165, 233, 0.08);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex-wrap: wrap;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>max-width: 950px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.toolbar label {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: bold;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: var(--primary-color);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 14px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.toolbar input, .toolbar select {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid #bae6fd;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 6px 10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Cairo', sans-serif;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 13px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>outline: none;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: border-color 0.2s;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.toolbar input:focus, .toolbar select:focus {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-color: var(--primary-color);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">        </span>/* معرض إطارات الإيموجي الدائري التفاعلي (يحتوي على الرموز المدرسية والوجوه) */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.emoji-gallery {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: var(--white);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 16px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 8px 20px rgba(14, 165, 233, 0.08);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>overflow-x: auto;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 25px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>max-width: 950px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.emoji-btn {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 48px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 48px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #f8fafc;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 3px solid #e2e8f0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 50%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 24px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>user-select: none;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex-shrink: 0;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.emoji-btn:hover {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>transform: scale(1.15) translateY(-2px);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 5px 15px rgba(14, 165, 233, 0.15);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-color: #7dd3fc;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.emoji-btn.active {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-color: #f59e0b;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 0 12px rgba(245, 158, 11, 0.5);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #fff;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transform: scale(1.1);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">        </span>/* منطقة ورقة العمل التفاعلية المتسعة والمؤطرة */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.capture-area {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: var(--bg-pastel);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: var(--text-color);<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 24px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>max-width: 950px;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 15px 35px rgba(14, 165, 233, 0.1);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: background-color 0.3s ease, color 0.3s ease;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-sizing: border-box;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: relative;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>overflow: hidden;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">        </span>/* حاويات الإطارات الأربعة الدائرية */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.emoji-border-container {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: absolute;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>justify-content: space-between;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>user-select: none;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>pointer-events: none;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.border-top { top: 12px; left: 15px; right: 15px; height: 35px; flex-direction: row; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.border-bottom { bottom: 12px; left: 15px; right: 15px; height: 35px; flex-direction: row; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.border-left { top: 50px; bottom: 50px; left: 15px; width: 35px; flex-direction: column; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.border-right { top: 50px; bottom: 50px; right: 15px; width: 35px; flex-direction: column; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.emoji-item {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: var(--emoji-size);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>line-height: 1;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: font-size 0.2s;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">        </span>/* المحتوى الداخلي للورقة التفاعلية */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.worksheet-content {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: var(--content-padding);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-sizing: border-box;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">        </span>/* لافتة العنوان الفاخرة (Header Banner) */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.header-banner {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: linear-gradient(135deg, var(--primary-color), #0284c7);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: var(--white);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 25px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 18px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 25px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 6px 18px rgba(14, 165, 233, 0.25);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.header-banner h1 { margin: 0; font-size: 36px; text-shadow: 0 2px 4px rgba(0,0,0,0.15); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.header-banner p { margin: 10px 0 0 0; font-size: 16px; opacity: 0.95; font-weight: bold;}</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">        </span>/* أزرار اختيار الجنس التفاعلية الملونة بالباستيل */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.worksheet-row {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 15px;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 17px;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: bold;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.label-emoji {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 24px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.gender-selector-container {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex-wrap: wrap;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.gender-btn {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Cairo', sans-serif;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 16px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: bold;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 10px 24px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid #cbd5e1;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 24px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: var(--white);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: var(--text-color);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.gender-btn:hover {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transform: translateY(-2px);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 4px 10px rgba(0,0,0,0.05);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.gender-btn#genderBoy {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: #e0f2fe;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-color: #bae6fd;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #0369a1;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.gender-btn#genderBoy.active {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: linear-gradient(135deg, #0284c7, #0369a1);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: var(--white);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-color: #0284c7;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 6px 15px rgba(2, 132, 199, 0.35);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.gender-btn#genderGirl {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: #fce7f3;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-color: #fbcfe8;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #be185d;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.gender-btn#genderGirl.active {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: linear-gradient(135deg, #db2777, #be185d);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: var(--white);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-color: #db2777;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 6px 15px rgba(219, 39, 119, 0.35);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.gender-btn .btn-gender-emoji {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 28px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">        </span>/* إدخال اسم الطالب بشكل مرح */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.student-name-box {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 25px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.student-name-box input {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 60%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>max-width: 400px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 12px 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 3px dashed var(--primary-color);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: bold;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: var(--text-color);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: rgba(255, 255, 255, 0.8);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: all 0.3s;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Cairo', sans-serif;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.student-name-box input:focus {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-style: solid;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #fff;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 0 15px rgba(14, 165, 233, 0.2);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>outline: none;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.section-card {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: rgba(255, 255, 255, 0.85);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 18px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 20px 25px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 4px 15px rgba(0,0,0,0.02);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid #e0f2fe;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">        </span>/* ترويسة الجدول */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.grid-header {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: grid;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>grid-template-columns: 2fr 1.5fr 2fr;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: bold;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 18px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: var(--primary-color);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-bottom: 3px solid var(--primary-color);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding-bottom: 12px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">        </span>/* صفوف المشاعر */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.feeling-row {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: grid;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>grid-template-columns: 2fr 1.5fr 2fr;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 15px 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-bottom: 1px dashed #cbd5e1;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: background-color 0.2s;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.feeling-row:hover { background-color: rgba(240, 249, 255, 0.5); border-radius: 10px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.feeling-row:last-child { border-bottom: none; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.situation-text {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 17px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: bold;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: var(--text-color);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">        </span>/* تصميم أزرار الإيموجي التفاعلية (الاختيار) */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.emoji-selector {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #f8fafc;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 1px solid #e2e8f0;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.emoji-option {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 26px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>filter: grayscale(100%) opacity(0.4); /* باهت جداً قبل الاختيار */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>user-select: none;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 4px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 50%;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.emoji-option:hover {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>filter: grayscale(0%) opacity(1);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transform: scale(1.2);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.emoji-option.selected {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>filter: grayscale(0%) opacity(1);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transform: scale(1.3);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: #fef08a; /* هالة صفراء جذابة للإيموجي المختار */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 0 12px rgba(253, 224, 71, 0.7);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.reason-input {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 10px 12px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid #cbd5e1;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Cairo', sans-serif;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-sizing: border-box;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #ffffff;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: 0.3s;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.reason-input:focus { border-color: var(--primary-color); outline: none; box-shadow: 0 0 8px rgba(14, 165, 233, 0.2); }</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">        </span>/* الأزرار السفلية */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.buttons-container {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex; gap: 15px; margin-top: 30px; justify-content: center; width: 100%; max-width: 950px; flex-wrap: wrap;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.btn {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Cairo', sans-serif; font-size: 16px; font-weight: bold; padding: 14px 30px;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: none; border-radius: 12px; cursor: pointer; color: var(--white); transition: 0.3s; display: flex; align-items: center; gap: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.btn-story { background: var(--btn-story-grad); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.25); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.btn-download { background: var(--btn-download-grad); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.25); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.btn-clear { background: linear-gradient(135deg, #f07167, #df4c40); box-shadow: 0 6px 20px rgba(240, 113, 103, 0.25); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.btn:hover { transform: translateY(-3px); filter: brightness(1.05);}</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">        </span>/* نافذة توليد بطاقة المشاعر النهائية */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.modal-content { background: #fff; padding: 30px; border-radius: 24px; max-width: 750px; width: 90%; position: relative; text-align: right; box-shadow: 0 20px 45px rgba(0,0,0,0.2); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.close-modal { position: absolute; top: 15px; left: 15px; font-size: 32px; font-weight: bold; cursor: pointer; color: #94a3b8; transition: 0.2s;}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.close-modal:hover { color: #ef4444; }</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.result-card {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: var(--bg-pastel);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: var(--text-color);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 5px double var(--primary-color);<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 40px;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 20px;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-top: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: relative;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>overflow: hidden;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-sizing: border-box;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.result-title {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: center; color: var(--primary-color); border-bottom: 2px dashed #93c5fd; padding-bottom: 15px; margin-top: 0; font-size: 28px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.result-item {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 15px; font-size: 17px; line-height: 1.8; background: rgba(255,255,255,0.85); padding: 15px 20px; border-radius: 12px; border: 1px solid #e0f2fe; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; align-items: flex-start; gap: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.result-item-emoji {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 26px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #fef08a;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 50%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 4px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>line-height: 1;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">        </span>/* --- إضافات ميزة الإملاء الصوتي --- */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.mic-btn {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #e0f2fe;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid #bae6fd;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 0 15px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: all 0.3s;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.mic-btn:hover { background: #bae6fd; transform: scale(1.05); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.mic-btn.recording {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #fee2e2;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-color: #fca5a5;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>animation: pulse 1.5s infinite;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>@keyframes pulse {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }</p>
-<p class="p1"><span class="Apple-converted-space">            </span>70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }</p>
-<p class="p1"><span class="Apple-converted-space">            </span>100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>@media (max-width: 768px) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.grid-header { display: none; } /* إخفاء الترويسة في الموبايل لضيق المساحة */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.feeling-row { grid-template-columns: 1fr; gap: 12px; background: #fff; padding: 20px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.03);}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.situation-text { text-align: center; border-bottom: 2px dashed #e2e8f0; padding-bottom: 10px; justify-content: center;}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.worksheet-content { padding: 30px 15px; }</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.gender-selector-container { flex-direction: column; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">    </span>&lt;!-- معرض الإيموجي الدائري التفاعلي للأوراق المبتكرة --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="emoji-gallery" id="emojiGallery"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="emoji-btn active" onclick="selectEmojiBorder('none', this)" title="بدون إطار"&gt;❌&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">        </span>&lt;!-- إيموجي مدرسية --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="emoji-btn" onclick="selectEmojiBorder('✏️', this)"&gt;✏️&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="emoji-btn" onclick="selectEmojiBorder('📚', this)"&gt;📚&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="emoji-btn" onclick="selectEmojiBorder('🎨', this)"&gt;🎨&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="emoji-btn" onclick="selectEmojiBorder('🍎', this)"&gt;🍎&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="emoji-btn" onclick="selectEmojiBorder('🏫', this)"&gt;🏫&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="emoji-btn" onclick="selectEmojiBorder('🚌', this)"&gt;🚌&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="emoji-btn" onclick="selectEmojiBorder('✂️', this)"&gt;✂️&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">        </span>&lt;!-- إيموجي زخرفية --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="emoji-btn" onclick="selectEmojiBorder('🌸', this)"&gt;🌸&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="emoji-btn" onclick="selectEmojiBorder('⭐', this)"&gt;⭐&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="emoji-btn" onclick="selectEmojiBorder('🍀', this)"&gt;🍀&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="emoji-btn" onclick="selectEmojiBorder('🍬', this)"&gt;🍬&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">        </span>&lt;!-- إيموجي وجوه مبهجة --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="emoji-btn" onclick="selectEmojiBorder('😊', this)"&gt;😊&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="emoji-btn" onclick="selectEmojiBorder('😎', this)"&gt;😎&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="emoji-btn" onclick="selectEmojiBorder('🤩', this)"&gt;🤩&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="emoji-btn" onclick="selectEmojiBorder('🤓', this)"&gt;🤓&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">    </span>&lt;!-- شريط الأدوات الذكي --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="toolbar"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;label for="bgColor"&gt;لون الخلفية:&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;input type="color" id="bgColor" value="#f0f9ff"&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;label for="textColor"&gt;لون النص:&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;input type="color" id="textColor" value="#334155"&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;label for="fontStyle"&gt;نوع الخط:&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;select id="fontStyle"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;option value="'Cairo', sans-serif"&gt;Cairo&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;option value="'Tahoma', sans-serif"&gt;Tahoma&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;option value="'Arial', sans-serif"&gt;Arial&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/select&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;label for="titleSize"&gt;حجم العنوان:&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;input type="range" id="titleSize" min="20" max="50" value="36"&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;label for="emojiSizeInput"&gt;حجم الإطار:&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;input type="range" id="emojiSizeInput" min="16" max="36" value="26" title="تعديل حجم الإيموجي"&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;label for="paddingSlider"&gt;تباعد النص:&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;input type="range" id="paddingSlider" min="30" max="100" value="50" title="تحكم في بعد المحتوى عن الإطار"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="captureArea" class="capture-area"&gt;</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">        </span>&lt;!-- حاويات رص الإطارات المتكررة بذكاء ودقة لورقة العمل --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="emoji-border-container border-top" id="borderTop"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="emoji-border-container border-bottom" id="borderBottom"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="emoji-border-container border-left" id="borderLeft"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="emoji-border-container border-right" id="borderRight"&gt;&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="worksheet-content"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="header-banner"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;h1 id="mainTitle"&gt;مشاعري تجاه المدرسة 🎒&lt;/h1&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;p id="subTitle"&gt;أيها البطل، اقرأ كل موقف، اختر الرمز الذي يعبر عن شعورك بدقة، واكتب السبب باختصار.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">            </span>&lt;!-- قسم اختيار الجنس --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="section-card" style="margin-bottom: 25px;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="worksheet-row" style="justify-content: center; text-align: center;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;label style="margin-left: 20px;"&gt;&lt;span class="label-emoji"&gt;🤔&lt;/span&gt; هل أنت تلميذ أم تلميذة؟&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="gender-selector-container"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;button type="button" id="genderBoy" class="gender-btn active" onclick="selectGender('boy')"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;span class="btn-gender-emoji"&gt;👦&lt;/span&gt; تلميذ</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;button type="button" id="genderGirl" class="gender-btn" onclick="selectGender('girl')"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;span class="btn-gender-emoji"&gt;👧&lt;/span&gt; تلميذة</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;input type="hidden" id="selectedGender" value="boy"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="student-name-box"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;input type="text" id="studentName" placeholder="اكتب اسمك الرائع هنا يا بطل..."&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="section-card"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="grid-header"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div&gt;متى: (الموقف)&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div&gt;أشعر بـ:&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div&gt;لأن: (السبب)&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">                </span>&lt;!-- يتم توليد الصفوف عبر الجافاسكريبت لتقليل التكرار --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div id="questionsContainer"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="buttons-container"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;button class="btn btn-story" onclick="generateFeelings()"&gt;✨ إنشاء بطاقة مشاعري&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;button class="btn btn-download" onclick="downloadPage()"&gt;📸 تحميل الصفحة فارغة&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;button class="btn btn-clear" onclick="clearAll()"&gt;🧹 امسح الكل&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">    </span>&lt;!-- نافذة النتيجة (Modal) --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="resultModal" class="modal-overlay"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="modal-content"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;span class="close-modal" onclick="closeModal()"&gt;&amp;times;&lt;/span&gt;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">            </span>&lt;!-- منطقة مخصصة لتحميل بطاقة النتيجة، تحتوي على الإطارات أيضاً --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div id="resultCaptureArea" class="result-card"&gt;</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">                </span>&lt;!-- حاويات رص الإطارات المصغرة داخل بطاقة النتيجة --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="emoji-border-container border-top" id="resBorderTop" style="top: 8px;"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="emoji-border-container border-bottom" id="resBorderBottom" style="bottom: 8px;"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="emoji-border-container border-left" id="resBorderLeft" style="top: 35px; bottom: 35px; left: 10px;"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="emoji-border-container border-right" id="resBorderRight" style="top: 35px; bottom: 35px; right: 10px;"&gt;&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;h2 class="result-title" id="resultTitle"&gt;لوحة مشاعري المدرسية&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div id="resultList"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div style="display: flex; justify-content: flex-end; margin-top: 20px; gap: 10px;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;button class="btn btn-download" style="background: linear-gradient(135deg, #8b5cf6, #6366f1);" onclick="printResult()"&gt;🖨️ طباعة البطاقة&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;button class="btn btn-download" onclick="downloadResult()"&gt;📸 تحميل كصورة&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const root = document.documentElement;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const captureArea = document.getElementById('captureArea');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const resultCaptureArea = document.getElementById('resultCaptureArea');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>let activeEmoji = 'none';</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const questions = [</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ text: "عندما يحين وقت الذهاب إلى المدرسة", icon: "🎒" },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ text: "عندما أكون في فصلي الدراسي الجديد", icon: "🏫" },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ text: "عندما ألتقي بطلاب جدد لأول مرة", icon: "👋" },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ text: "عندما يكون لديّ معلم جديد", icon: "👨‍🏫" },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ text: "عندما يحين وقت الاستراحة واللعب", icon: "⚽" },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ text: "عندما يناديني المعلم للإجابة", icon: "🙋" },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ text: "عندما يكون لدي واجبات منزلية", icon: "📝" },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ text: "عندما يحين وقت العودة إلى المنزل", icon: "🏠" }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>];</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const emojis = ['😃', '🙂', '😕', '😢', '😡']; // سعيد، عادي، متوتر/محتار، حزين، غاضب</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const container = document.getElementById('questionsContainer');</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">        </span>// دالة تغيير الجنس وتحديث النصوص</p>
-<p class="p1"><span class="Apple-converted-space">        </span>function selectGender(gender) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('genderBoy').classList.remove('active');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('genderGirl').classList.remove('active');</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (gender === 'boy') {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('genderBoy').classList.add('active');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('selectedGender').value = 'boy';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('subTitle').innerText = 'أيها البطل، اقرأ كل موقف، اختر الرمز الذي يعبر عن شعورك بدقة، واكتب السبب باختصار.';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('studentName').placeholder = 'اكتب اسمك الرائع هنا يا بطل...';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('genderGirl').classList.add('active');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('selectedGender').value = 'girl';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('subTitle').innerText = 'أيتها البطلة، اقرئي كل موقف، اختاري الرمز الذي يعبر عن شعورك بدقة، واكتبي السبب باختصار.';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('studentName').placeholder = 'اكتبي اسمك الرائع هنا يا بطلة...';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">        </span>// 1. بناء الأسئلة ديناميكياً مع زر المايكروفون الذكي</p>
-<p class="p1"><span class="Apple-converted-space">        </span>questions.forEach((q, index) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>let emojiHTML = '';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>emojis.forEach(e =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>emojiHTML += `&lt;span class="emoji-option" onclick="selectEmoji(${index}, this)"&gt;${e}&lt;/span&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>container.innerHTML += `</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="feeling-row"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="situation-text"&gt;&lt;span style="font-size: 20px;"&gt;${q.icon}&lt;/span&gt; ${q.text}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="emoji-selector" id="emoji-group-${index}"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>${emojiHTML}</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div style="display: flex; gap: 8px;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;input type="text" class="reason-input" id="reason-${index}" placeholder="أشعر هكذا لأن..."&gt;</p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">                        </span>&lt;!-- زر التحدث --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;button class="mic-btn" onclick="startDictation('reason-${index}', this)" title="اضغط للتحدث بدلاً من الكتابة"&gt;🎙️&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;input type="hidden" id="selected-emoji-${index}" value=""&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>`;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">        </span>// 2. دالة اختيار الإيموجي (التعبير عن المشاعر)</p>
-<p class="p1"><span class="Apple-converted-space">        </span>function selectEmoji(rowIndex, element) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const group = document.getElementById(`emoji-group-${rowIndex}`);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>group.querySelectorAll('.emoji-option').forEach(el =&gt; el.classList.remove('selected'));</p>
-<p class="p1"><span class="Apple-converted-space">            </span>element.classList.add('selected');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById(`selected-emoji-${rowIndex}`).value = element.innerText;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">        </span>// 3. بناء إطارات الإيموجي (تعمل على ورقة العمل وبطاقة النتيجة معاً)</p>
-<p class="p1"><span class="Apple-converted-space">        </span>function renderEmojiBorder() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const containers = [</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ top: 'borderTop', bottom: 'borderBottom', left: 'borderLeft', right: 'borderRight', area: captureArea, scale: 30 },</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ top: 'resBorderTop', bottom: 'resBorderBottom', left: 'resBorderLeft', right: 'resBorderRight', area: resultCaptureArea, scale: 16 }</p>
-<p class="p1"><span class="Apple-converted-space">            </span>];</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>containers.forEach(c =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const topCont = document.getElementById(c.top);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const bottomCont = document.getElementById(c.bottom);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const leftCont = document.getElementById(c.left);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const rightCont = document.getElementById(c.right);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>topCont.innerHTML = ''; bottomCont.innerHTML = ''; leftCont.innerHTML = ''; rightCont.innerHTML = '';</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (activeEmoji === 'none') return;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>const width = c.area.offsetWidth;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const height = c.area.offsetHeight;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>const emojiSizeStr = getComputedStyle(root).getPropertyValue('--emoji-size');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const emojiSize = parseInt(emojiSizeStr) || 26;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const spacing = emojiSize + 10;<span class="Apple-converted-space"> </span></p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>const cols = Math.floor((width - c.scale) / spacing);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const rows = Math.floor((height - (c.scale * 2)) / spacing);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>for (let i = 0; i &lt; cols; i++) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>topCont.innerHTML += `&lt;span class="emoji-item"&gt;${activeEmoji}&lt;/span&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>bottomCont.innerHTML += `&lt;span class="emoji-item"&gt;${activeEmoji}&lt;/span&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>for (let i = 0; i &lt; rows; i++) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>leftCont.innerHTML += `&lt;span class="emoji-item"&gt;${activeEmoji}&lt;/span&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>rightCont.innerHTML += `&lt;span class="emoji-item"&gt;${activeEmoji}&lt;/span&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function selectEmojiBorder(emoji, element) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.querySelectorAll('.emoji-gallery .emoji-btn').forEach(btn =&gt; btn.classList.remove('active'));</p>
-<p class="p1"><span class="Apple-converted-space">            </span>element.classList.add('active');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>activeEmoji = emoji;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>renderEmojiBorder();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">        </span>// مراقبة تغيير الحجم لإعادة رص الإيموجي</p>
-<p class="p1"><span class="Apple-converted-space">        </span>window.addEventListener('resize', renderEmojiBorder);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const resizeObserver = new ResizeObserver(() =&gt; renderEmojiBorder());</p>
-<p class="p1"><span class="Apple-converted-space">        </span>resizeObserver.observe(captureArea);</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">        </span>// 4. أدوات التحكم بالخلفيات والألوان والمقاسات</p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('bgColor').addEventListener('input', e =&gt; {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>root.style.setProperty('--bg-pastel', e.target.value);<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('textColor').addEventListener('input', e =&gt; {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>root.style.setProperty('--text-color', e.target.value);<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('fontStyle').addEventListener('change', e =&gt; { captureArea.style.fontFamily = e.target.value; resultCaptureArea.style.fontFamily = e.target.value; });</p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('titleSize').addEventListener('input', e =&gt; { document.getElementById('mainTitle').style.fontSize = e.target.value + 'px'; });</p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('emojiSizeInput').addEventListener('input', e =&gt; { root.style.setProperty('--emoji-size', e.target.value + 'px'); renderEmojiBorder(); });</p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('paddingSlider').addEventListener('input', e =&gt; { root.style.setProperty('--content-padding', e.target.value + 'px'); renderEmojiBorder(); });</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">        </span>// 5. دالة توليد بطاقة المشاعر النهائية</p>
-<p class="p1"><span class="Apple-converted-space">        </span>function generateFeelings() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const name = document.getElementById('studentName').value.trim();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const gender = document.getElementById('selectedGender').value;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const roleTitle = gender === 'boy' ? 'البطل' : 'البطلة';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const alertMsgName = gender === 'boy' ? 'لتكون البطاقة باسمك!' : 'لتكون البطاقة باسمكِ!';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const alertMsgFill = gender === 'boy' ? 'يرجى اختيار رمز تعبيري وكتابة سبب لكل المواقف لنتمكن من صنع بطاقتك الرائعة!' : 'يرجى اختيار رمز تعبيري وكتابة سبب لكل المواقف لنتمكن من صنع بطاقتكِ الرائعة!';</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>if(!name) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>Swal.fire('عذراً!', `الرجاء كتابة اسمك أولاً يا ${roleTitle} ${alertMsgName}`, 'warning');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>let resultHTML = '';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>let allAnswered = true;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>questions.forEach((q, index) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const selectedEmoji = document.getElementById(`selected-emoji-${index}`).value;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const reason = document.getElementById(`reason-${index}`).value.trim();</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>if(!selectedEmoji || !reason) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>allAnswered = false;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>resultHTML += `</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="result-item"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="result-item-emoji"&gt;${selectedEmoji}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>&lt;strong style="color: var(--primary-color);"&gt;${q.icon} ${q.text}:&lt;/strong&gt;&lt;br&gt;<span class="Apple-converted-space"> </span></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">                                </span>أشعر هكذا لأن ${reason}.</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>`;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>if(!allAnswered) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>Swal.fire({</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>title: 'تنبيه لطيف',<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>text: alertMsgFill,<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>icon: 'info',</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>confirmButtonText: 'حسناً سأكملها'</p>
-<p class="p1"><span class="Apple-converted-space">                </span>});</p>
-<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('resultTitle').innerText = `لوحة مشاعر ${roleTitle}: ${name}`;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('resultList').innerHTML = resultHTML;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">            </span>// فتح النافذة</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('resultModal').style.display = 'flex';</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">            </span>// تحديث إطارات الإيموجي للنتيجة لتتطابق مع خيار الطالب</p>
-<p class="p1"><span class="Apple-converted-space">            </span>setTimeout(renderEmojiBorder, 50);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function closeModal() { document.getElementById('resultModal').style.display = 'none'; }</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">        </span>// 6. دوال التحميل (html2canvas)</p>
-<p class="p1"><span class="Apple-converted-space">        </span>function downloadPage() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>html2canvas(document.getElementById('captureArea'), { scale: 2, backgroundColor: null, useCORS: true }).then(canvas =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const link = document.createElement('a'); link.download = 'ورقة_مشاعري_تجاه_المدرسة.png'; link.href = canvas.toDataURL(); link.click();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function downloadResult() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>html2canvas(document.getElementById('resultCaptureArea'), { scale: 2, backgroundColor: null, useCORS: true }).then(canvas =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const link = document.createElement('a'); link.download = 'بطاقة_مشاعري.png'; link.href = canvas.toDataURL(); link.click();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">        </span>// 7. دالة الإملاء الصوتي (تحويل الكلام إلى نص) - ميزة مساندة للتنوع العصبي</p>
-<p class="p1"><span class="Apple-converted-space">        </span>function startDictation(inputId, btn) {</p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">            </span>// التحقق من دعم المتصفح لميزة التعرف على الصوت</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (!SpeechRecognition) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>Swal.fire('عذراً!', 'متصفحك الحالي لا يدعم ميزة الإملاء الصوتي. يرجى استخدام متصفح Google Chrome.', 'error');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>const recognition = new SpeechRecognition();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>recognition.lang = 'ar-SA'; // تعيين اللغة العربية</p>
-<p class="p1"><span class="Apple-converted-space">            </span>recognition.interimResults = false; // ننتظر حتى ينهي الطفل كلامه</p>
-<p class="p1"><span class="Apple-converted-space">            </span>recognition.maxAlternatives = 1;</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">            </span>// عند بدء التسجيل: نضيف تأثير النبض الأحمر للزر ليعرف الطفل أنه يعمل</p>
-<p class="p1"><span class="Apple-converted-space">            </span>recognition.onstart = function() {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>btn.classList.add('recording');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>btn.title = "أنا أستمع... تحدث الآن";</p>
-<p class="p1"><span class="Apple-converted-space">            </span>};</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">            </span>// عند التقاط الصوت وتحويله لنص</p>
-<p class="p1"><span class="Apple-converted-space">            </span>recognition.onresult = function(event) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const transcript = event.results[0][0].transcript;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const input = document.getElementById(inputId);</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">                </span>// إذا كان هناك نص سابق، نضيف مسافة ثم النص الجديد، وإلا نضع النص مباشرة</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if(input.value.trim() !== '') {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>input.value += ' ' + transcript;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>input.value = transcript;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>};</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">            </span>// عند انتهاء التسجيل أو حدوث خطأ نوقف التأثير البصري</p>
-<p class="p1"><span class="Apple-converted-space">            </span>recognition.onend = function() {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>btn.classList.remove('recording');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>btn.title = "تحدث بدلاً من الكتابة";</p>
-<p class="p1"><span class="Apple-converted-space">            </span>};</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>recognition.onerror = function(event) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>btn.classList.remove('recording');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>console.error("خطأ في التعرف على الصوت:", event.error);</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">                </span>// إضافة معالجة ذكية لحظر المايكروفون من قبل Google Sites</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (event.error === 'not-allowed') {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>Swal.fire({</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>title: 'تنبيه أمان 🛡️',</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>text: 'نظام الأمان في هذا الموقع يمنع تشغيل المايكروفون من الداخل. لا تقلق يا بطل، يمكنك كتابة مشاعرك يدوياً في المربع!',</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>icon: 'info',</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>confirmButtonText: 'حسناً، سأكتب يدوياً',</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>confirmButtonColor: '#0ea5e9'</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>};</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">            </span>// تشغيل المايكروفون</p>
-<p class="p1"><span class="Apple-converted-space">            </span>try {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>recognition.start();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} catch (err) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>console.error(err);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">        </span>// 8. دالة الطباعة المباشرة لبطاقة النتيجة</p>
-<p class="p1"><span class="Apple-converted-space">        </span>function printResult() {</p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">            </span>// نأخذ لقطة عالية الدقة للمنطقة ثم نفتحها في نافذة جديدة ونعطي أمر الطباعة</p>
-<p class="p1"><span class="Apple-converted-space">            </span>html2canvas(document.getElementById('resultCaptureArea'), { scale: 2 }).then(canvas =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const imgData = canvas.toDataURL('image/png');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const printWindow = window.open('', '_blank');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>printWindow.document.write(`</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;html dir="rtl"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;head&gt;&lt;title&gt;طباعة بطاقة المشاعر&lt;/title&gt;&lt;/head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;body style="margin:0; display:flex; justify-content:center; align-items:center; min-height:100vh; background:#fff;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;img src="${imgData}" style="max-width:100%; height:auto;" onload="window.print(); window.close();"/&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/body&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/html&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>`);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>printWindow.document.close();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">        </span>// 9. دالة مسح الكل لإعادة استخدام المولد بسهولة</p>
-<p class="p1"><span class="Apple-converted-space">        </span>function clearAll() {</p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">            </span>// مسح الاسم</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('studentName').value = '';</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">            </span>// مسح الإجابات والخيارات</p>
-<p class="p1"><span class="Apple-converted-space">            </span>questions.forEach((q, index) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById(`reason-${index}`).value = '';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById(`selected-emoji-${index}`).value = '';</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">                </span>// إزالة التأثير البصري للاختيار</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const group = document.getElementById(`emoji-group-${index}`);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if(group) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>group.querySelectorAll('.emoji-option').forEach(el =&gt; el.classList.remove('selected'));</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">            </span>// إرجاع الإطار الافتراضي (بدون إطار)</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const noFrameBtn = document.querySelector('.emoji-gallery .emoji-btn');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if(noFrameBtn) selectEmojiBorder('none', noFrameBtn);</p>
-<p class="p2"><br></p>
-<p dir="rtl" class="p1"><span class="Apple-converted-space">            </span>// رسالة تأكيد تفاعلية لطيفة</p>
-<p class="p1"><span class="Apple-converted-space">            </span>Swal.fire({</p>
-<p class="p1"><span class="Apple-converted-space">                </span>title: 'تم المسح بنجاح! ✨',</p>
-<p class="p1"><span class="Apple-converted-space">                </span>text: 'الورقة الآن نظيفة وجاهزة لاستخدامها من جديد.',</p>
-<p class="p1"><span class="Apple-converted-space">                </span>icon: 'success',</p>
-<p class="p1"><span class="Apple-converted-space">                </span>confirmButtonText: 'رائع',</p>
-<p class="p1"><span class="Apple-converted-space">                </span>confirmButtonColor: '#0ea5e9'</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+
+    <!-- معرض الإيموجي الدائري التفاعلي للأوراق المبتكرة -->
+    <div class="emoji-gallery" id="emojiGallery">
+        <div class="emoji-btn active" onclick="selectEmojiBorder('none', this)" title="بدون إطار">❌</div>
+        
+        <!-- إيموجي مدرسية -->
+        <div class="emoji-btn" onclick="selectEmojiBorder('✏️', this)">✏️</div>
+        <div class="emoji-btn" onclick="selectEmojiBorder('📚', this)">📚</div>
+        <div class="emoji-btn" onclick="selectEmojiBorder('🎨', this)">🎨</div>
+        <div class="emoji-btn" onclick="selectEmojiBorder('🍎', this)">🍎</div>
+        <div class="emoji-btn" onclick="selectEmojiBorder('🏫', this)">🏫</div>
+        <div class="emoji-btn" onclick="selectEmojiBorder('🚌', this)">🚌</div>
+        <div class="emoji-btn" onclick="selectEmojiBorder('✂️', this)">✂️</div>
+        
+        <!-- إيموجي زخرفية -->
+        <div class="emoji-btn" onclick="selectEmojiBorder('🌸', this)">🌸</div>
+        <div class="emoji-btn" onclick="selectEmojiBorder('⭐', this)">⭐</div>
+        <div class="emoji-btn" onclick="selectEmojiBorder('🍀', this)">🍀</div>
+        <div class="emoji-btn" onclick="selectEmojiBorder('🍬', this)">🍬</div>
+        
+        <!-- إيموجي وجوه مبهجة -->
+        <div class="emoji-btn" onclick="selectEmojiBorder('😊', this)">😊</div>
+        <div class="emoji-btn" onclick="selectEmojiBorder('😎', this)">😎</div>
+        <div class="emoji-btn" onclick="selectEmojiBorder('🤩', this)">🤩</div>
+        <div class="emoji-btn" onclick="selectEmojiBorder('🤓', this)">🤓</div>
+    </div>
+
+    <!-- شريط الأدوات الذكي -->
+    <div class="toolbar">
+        <label for="bgColor">لون الخلفية:</label>
+        <input type="color" id="bgColor" value="#f0f9ff">
+
+        <label for="textColor">لون النص:</label>
+        <input type="color" id="textColor" value="#334155">
+
+        <label for="fontStyle">نوع الخط:</label>
+        <select id="fontStyle">
+            <option value="'Cairo', sans-serif">Cairo</option>
+            <option value="'Tahoma', sans-serif">Tahoma</option>
+            <option value="'Arial', sans-serif">Arial</option>
+        </select>
+
+        <label for="titleSize">حجم العنوان:</label>
+        <input type="range" id="titleSize" min="20" max="50" value="36">
+
+        <label for="emojiSizeInput">حجم الإطار:</label>
+        <input type="range" id="emojiSizeInput" min="16" max="36" value="26" title="تعديل حجم الإيموجي">
+
+        <label for="paddingSlider">تباعد النص:</label>
+        <input type="range" id="paddingSlider" min="30" max="100" value="50" title="تحكم في بعد المحتوى عن الإطار">
+    </div>
+
+    <div id="captureArea" class="capture-area">
+        
+        <!-- حاويات رص الإطارات المتكررة بذكاء ودقة لورقة العمل -->
+        <div class="emoji-border-container border-top" id="borderTop"></div>
+        <div class="emoji-border-container border-bottom" id="borderBottom"></div>
+        <div class="emoji-border-container border-left" id="borderLeft"></div>
+        <div class="emoji-border-container border-right" id="borderRight"></div>
+
+        <div class="worksheet-content">
+            <div class="header-banner">
+                <h1 id="mainTitle">مشاعري تجاه المدرسة 🎒</h1>
+                <p id="subTitle">أيها البطل، اقرأ كل موقف، اختر الرمز الذي يعبر عن شعورك بدقة، واكتب السبب باختصار.</p>
+            </div>
+            
+            <!-- قسم اختيار الجنس -->
+            <div class="section-card" style="margin-bottom: 25px;">
+                <div class="worksheet-row" style="justify-content: center; text-align: center;">
+                    <label style="margin-left: 20px;"><span class="label-emoji">🤔</span> هل أنت تلميذ أم تلميذة؟</label>
+                    <div class="gender-selector-container">
+                        <button type="button" id="genderBoy" class="gender-btn active" onclick="selectGender('boy')">
+                            <span class="btn-gender-emoji">👦</span> تلميذ
+                        </button>
+                        <button type="button" id="genderGirl" class="gender-btn" onclick="selectGender('girl')">
+                            <span class="btn-gender-emoji">👧</span> تلميذة
+                        </button>
+                    </div>
+                    <input type="hidden" id="selectedGender" value="boy">
+                </div>
+            </div>
+
+            <div class="student-name-box">
+                <input type="text" id="studentName" placeholder="اكتب اسمك الرائع هنا يا بطل...">
+            </div>
+
+            <div class="section-card">
+                <div class="grid-header">
+                    <div>متى: (الموقف)</div>
+                    <div>أشعر بـ:</div>
+                    <div>لأن: (السبب)</div>
+                </div>
+
+                <!-- يتم توليد الصفوف عبر الجافاسكريبت لتقليل التكرار -->
+                <div id="questionsContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="buttons-container">
+        <button class="btn btn-story" onclick="generateFeelings()">✨ إنشاء بطاقة مشاعري</button>
+        <button class="btn btn-download" onclick="downloadPage()">📸 تحميل الصفحة فارغة</button>
+        <button class="btn btn-clear" onclick="clearAll()">🧹 امسح الكل</button>
+    </div>
+
+    <!-- نافذة النتيجة (Modal) -->
+    <div id="resultModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            
+            <!-- منطقة مخصصة لتحميل بطاقة النتيجة، تحتوي على الإطارات أيضاً -->
+            <div id="resultCaptureArea" class="result-card">
+                
+                <!-- حاويات رص الإطارات المصغرة داخل بطاقة النتيجة -->
+                <div class="emoji-border-container border-top" id="resBorderTop" style="top: 8px;"></div>
+                <div class="emoji-border-container border-bottom" id="resBorderBottom" style="bottom: 8px;"></div>
+                <div class="emoji-border-container border-left" id="resBorderLeft" style="top: 35px; bottom: 35px; left: 10px;"></div>
+                <div class="emoji-border-container border-right" id="resBorderRight" style="top: 35px; bottom: 35px; right: 10px;"></div>
+
+                <h2 class="result-title" id="resultTitle">لوحة مشاعري المدرسية</h2>
+                <div id="resultList"></div>
+            </div>
+            
+            <div style="display: flex; justify-content: flex-end; margin-top: 20px; gap: 10px;">
+                <button class="btn btn-download" style="background: linear-gradient(135deg, #8b5cf6, #6366f1);" onclick="printResult()">🖨️ طباعة البطاقة</button>
+                <button class="btn btn-download" onclick="downloadResult()">📸 تحميل كصورة</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const root = document.documentElement;
+        const captureArea = document.getElementById('captureArea');
+        const resultCaptureArea = document.getElementById('resultCaptureArea');
+        let activeEmoji = 'none';
+
+        const questions = [
+            { text: "عندما يحين وقت الذهاب إلى المدرسة", icon: "🎒" },
+            { text: "عندما أكون في فصلي الدراسي الجديد", icon: "🏫" },
+            { text: "عندما ألتقي بطلاب جدد لأول مرة", icon: "👋" },
+            { text: "عندما يكون لديّ معلم جديد", icon: "👨‍🏫" },
+            { text: "عندما يحين وقت الاستراحة واللعب", icon: "⚽" },
+            { text: "عندما يناديني المعلم للإجابة", icon: "🙋" },
+            { text: "عندما يكون لدي واجبات منزلية", icon: "📝" },
+            { text: "عندما يحين وقت العودة إلى المنزل", icon: "🏠" }
+        ];
+
+        const emojis = ['😃', '🙂', '😕', '😢', '😡']; // سعيد، عادي، متوتر/محتار، حزين، غاضب
+
+        const container = document.getElementById('questionsContainer');
+
+        // دالة تغيير الجنس وتحديث النصوص
+        function selectGender(gender) {
+            document.getElementById('genderBoy').classList.remove('active');
+            document.getElementById('genderGirl').classList.remove('active');
+            
+            if (gender === 'boy') {
+                document.getElementById('genderBoy').classList.add('active');
+                document.getElementById('selectedGender').value = 'boy';
+                document.getElementById('subTitle').innerText = 'أيها البطل، اقرأ كل موقف، اختر الرمز الذي يعبر عن شعورك بدقة، واكتب السبب باختصار.';
+                document.getElementById('studentName').placeholder = 'اكتب اسمك الرائع هنا يا بطل...';
+            } else {
+                document.getElementById('genderGirl').classList.add('active');
+                document.getElementById('selectedGender').value = 'girl';
+                document.getElementById('subTitle').innerText = 'أيتها البطلة، اقرئي كل موقف، اختاري الرمز الذي يعبر عن شعورك بدقة، واكتبي السبب باختصار.';
+                document.getElementById('studentName').placeholder = 'اكتبي اسمك الرائع هنا يا بطلة...';
+            }
+        }
+
+        // 1. بناء الأسئلة ديناميكياً مع زر المايكروفون الذكي
+        questions.forEach((q, index) => {
+            let emojiHTML = '';
+            emojis.forEach(e => {
+                emojiHTML += `<span class="emoji-option" onclick="selectEmoji(${index}, this)">${e}</span>`;
+            });
+
+            container.innerHTML += `
+                <div class="feeling-row">
+                    <div class="situation-text"><span style="font-size: 20px;">${q.icon}</span> ${q.text}</div>
+                    <div class="emoji-selector" id="emoji-group-${index}">
+                        ${emojiHTML}
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" class="reason-input" id="reason-${index}" placeholder="أشعر هكذا لأن...">
+                        <!-- زر التحدث -->
+                        <button class="mic-btn" onclick="startDictation('reason-${index}', this)" title="اضغط للتحدث بدلاً من الكتابة">🎙️</button>
+                        <input type="hidden" id="selected-emoji-${index}" value="">
+                    </div>
+                </div>
+            `;
+        });
+
+        // 2. دالة اختيار الإيموجي (التعبير عن المشاعر)
+        function selectEmoji(rowIndex, element) {
+            const group = document.getElementById(`emoji-group-${rowIndex}`);
+            group.querySelectorAll('.emoji-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            document.getElementById(`selected-emoji-${rowIndex}`).value = element.innerText;
+        }
+
+        // 3. بناء إطارات الإيموجي (تعمل على ورقة العمل وبطاقة النتيجة معاً)
+        function renderEmojiBorder() {
+            const containers = [
+                { top: 'borderTop', bottom: 'borderBottom', left: 'borderLeft', right: 'borderRight', area: captureArea, scale: 30 },
+                { top: 'resBorderTop', bottom: 'resBorderBottom', left: 'resBorderLeft', right: 'resBorderRight', area: resultCaptureArea, scale: 16 }
+            ];
+
+            containers.forEach(c => {
+                const topCont = document.getElementById(c.top);
+                const bottomCont = document.getElementById(c.bottom);
+                const leftCont = document.getElementById(c.left);
+                const rightCont = document.getElementById(c.right);
+
+                topCont.innerHTML = ''; bottomCont.innerHTML = ''; leftCont.innerHTML = ''; rightCont.innerHTML = '';
+
+                if (activeEmoji === 'none') return;
+
+                const width = c.area.offsetWidth;
+                const height = c.area.offsetHeight;
+
+                const emojiSizeStr = getComputedStyle(root).getPropertyValue('--emoji-size');
+                const emojiSize = parseInt(emojiSizeStr) || 26;
+                const spacing = emojiSize + 10; 
+
+                const cols = Math.floor((width - c.scale) / spacing);
+                const rows = Math.floor((height - (c.scale * 2)) / spacing);
+
+                for (let i = 0; i < cols; i++) {
+                    topCont.innerHTML += `<span class="emoji-item">${activeEmoji}</span>`;
+                    bottomCont.innerHTML += `<span class="emoji-item">${activeEmoji}</span>`;
+                }
+                for (let i = 0; i < rows; i++) {
+                    leftCont.innerHTML += `<span class="emoji-item">${activeEmoji}</span>`;
+                    rightCont.innerHTML += `<span class="emoji-item">${activeEmoji}</span>`;
+                }
+            });
+        }
+
+        function selectEmojiBorder(emoji, element) {
+            document.querySelectorAll('.emoji-gallery .emoji-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+            activeEmoji = emoji;
+            renderEmojiBorder();
+        }
+
+        // مراقبة تغيير الحجم لإعادة رص الإيموجي
+        window.addEventListener('resize', renderEmojiBorder);
+        const resizeObserver = new ResizeObserver(() => renderEmojiBorder());
+        resizeObserver.observe(captureArea);
+
+        // 4. أدوات التحكم بالخلفيات والألوان والمقاسات
+        document.getElementById('bgColor').addEventListener('input', e => { 
+            root.style.setProperty('--bg-pastel', e.target.value); 
+        });
+        document.getElementById('textColor').addEventListener('input', e => { 
+            root.style.setProperty('--text-color', e.target.value); 
+        });
+        document.getElementById('fontStyle').addEventListener('change', e => { captureArea.style.fontFamily = e.target.value; resultCaptureArea.style.fontFamily = e.target.value; });
+        document.getElementById('titleSize').addEventListener('input', e => { document.getElementById('mainTitle').style.fontSize = e.target.value + 'px'; });
+        document.getElementById('emojiSizeInput').addEventListener('input', e => { root.style.setProperty('--emoji-size', e.target.value + 'px'); renderEmojiBorder(); });
+        document.getElementById('paddingSlider').addEventListener('input', e => { root.style.setProperty('--content-padding', e.target.value + 'px'); renderEmojiBorder(); });
+
+        // 5. دالة توليد بطاقة المشاعر النهائية
+        function generateFeelings() {
+            const name = document.getElementById('studentName').value.trim();
+            const gender = document.getElementById('selectedGender').value;
+            const roleTitle = gender === 'boy' ? 'البطل' : 'البطلة';
+            const alertMsgName = gender === 'boy' ? 'لتكون البطاقة باسمك!' : 'لتكون البطاقة باسمكِ!';
+            const alertMsgFill = gender === 'boy' ? 'يرجى اختيار رمز تعبيري وكتابة سبب لكل المواقف لنتمكن من صنع بطاقتك الرائعة!' : 'يرجى اختيار رمز تعبيري وكتابة سبب لكل المواقف لنتمكن من صنع بطاقتكِ الرائعة!';
+
+            if(!name) {
+                Swal.fire('عذراً!', `الرجاء كتابة اسمك أولاً يا ${roleTitle} ${alertMsgName}`, 'warning');
+                return;
+            }
+
+            let resultHTML = '';
+            let allAnswered = true;
+
+            questions.forEach((q, index) => {
+                const selectedEmoji = document.getElementById(`selected-emoji-${index}`).value;
+                const reason = document.getElementById(`reason-${index}`).value.trim();
+
+                if(!selectedEmoji || !reason) {
+                    allAnswered = false;
+                } else {
+                    resultHTML += `
+                        <div class="result-item">
+                            <div class="result-item-emoji">${selectedEmoji}</div>
+                            <div>
+                                <strong style="color: var(--primary-color);">${q.icon} ${q.text}:</strong><br> 
+                                أشعر هكذا لأن ${reason}.
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            if(!allAnswered) {
+                Swal.fire({
+                    title: 'تنبيه لطيف', 
+                    text: alertMsgFill, 
+                    icon: 'info',
+                    confirmButtonText: 'حسناً سأكملها'
+                });
+                return;
+            }
+
+            document.getElementById('resultTitle').innerText = `لوحة مشاعر ${roleTitle}: ${name}`;
+            document.getElementById('resultList').innerHTML = resultHTML;
+            
+            // فتح النافذة
+            document.getElementById('resultModal').style.display = 'flex';
+            
+            // تحديث إطارات الإيموجي للنتيجة لتتطابق مع خيار الطالب
+            setTimeout(renderEmojiBorder, 50);
+        }
+
+        function closeModal() { document.getElementById('resultModal').style.display = 'none'; }
+
+        // 6. دوال التحميل (html2canvas)
+        function downloadPage() {
+            html2canvas(document.getElementById('captureArea'), { scale: 2, backgroundColor: null, useCORS: true }).then(canvas => {
+                const link = document.createElement('a'); link.download = 'ورقة_مشاعري_تجاه_المدرسة.png'; link.href = canvas.toDataURL(); link.click();
+            });
+        }
+
+        function downloadResult() {
+            html2canvas(document.getElementById('resultCaptureArea'), { scale: 2, backgroundColor: null, useCORS: true }).then(canvas => {
+                const link = document.createElement('a'); link.download = 'بطاقة_مشاعري.png'; link.href = canvas.toDataURL(); link.click();
+            });
+        }
+
+        // 7. دالة الإملاء الصوتي (تحويل الكلام إلى نص) - ميزة مساندة للتنوع العصبي
+        function startDictation(inputId, btn) {
+            // التحقق من دعم المتصفح لميزة التعرف على الصوت
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                Swal.fire('عذراً!', 'متصفحك الحالي لا يدعم ميزة الإملاء الصوتي. يرجى استخدام متصفح Google Chrome.', 'error');
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'ar-SA'; // تعيين اللغة العربية
+            recognition.interimResults = false; // ننتظر حتى ينهي الطفل كلامه
+            recognition.maxAlternatives = 1;
+
+            // عند بدء التسجيل: نضيف تأثير النبض الأحمر للزر ليعرف الطفل أنه يعمل
+            recognition.onstart = function() {
+                btn.classList.add('recording');
+                btn.title = "أنا أستمع... تحدث الآن";
+            };
+
+            // عند التقاط الصوت وتحويله لنص
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                const input = document.getElementById(inputId);
+                
+                // إذا كان هناك نص سابق، نضيف مسافة ثم النص الجديد، وإلا نضع النص مباشرة
+                if(input.value.trim() !== '') {
+                    input.value += ' ' + transcript;
+                } else {
+                    input.value = transcript;
+                }
+            };
+
+            // عند انتهاء التسجيل أو حدوث خطأ نوقف التأثير البصري
+            recognition.onend = function() {
+                btn.classList.remove('recording');
+                btn.title = "تحدث بدلاً من الكتابة";
+            };
+
+            recognition.onerror = function(event) {
+                btn.classList.remove('recording');
+                console.error("خطأ في التعرف على الصوت:", event.error);
+                
+                // إضافة معالجة ذكية لحظر المايكروفون من قبل Google Sites
+                if (event.error === 'not-allowed') {
+                    Swal.fire({
+                        title: 'تنبيه أمان 🛡️',
+                        text: 'نظام الأمان في هذا الموقع يمنع تشغيل المايكروفون من الداخل. لا تقلق يا بطل، يمكنك كتابة مشاعرك يدوياً في المربع!',
+                        icon: 'info',
+                        confirmButtonText: 'حسناً، سأكتب يدوياً',
+                        confirmButtonColor: '#0ea5e9'
+                    });
+                }
+            };
+
+            // تشغيل المايكروفون
+            try {
+                recognition.start();
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        // 8. دالة الطباعة المباشرة لبطاقة النتيجة
+        function printResult() {
+            // نأخذ لقطة عالية الدقة للمنطقة ثم نفتحها في نافذة جديدة ونعطي أمر الطباعة
+            html2canvas(document.getElementById('resultCaptureArea'), { scale: 2 }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <html dir="rtl">
+                        <head><title>طباعة بطاقة المشاعر</title></head>
+                        <body style="margin:0; display:flex; justify-content:center; align-items:center; min-height:100vh; background:#fff;">
+                            <img src="${imgData}" style="max-width:100%; height:auto;" onload="window.print(); window.close();"/>
+                        </body>
+                    </html>
+                `);
+                printWindow.document.close();
+            });
+        }
+
+        // 9. دالة مسح الكل لإعادة استخدام المولد بسهولة
+        function clearAll() {
+            // مسح الاسم
+            document.getElementById('studentName').value = '';
+            
+            // مسح الإجابات والخيارات
+            questions.forEach((q, index) => {
+                document.getElementById(`reason-${index}`).value = '';
+                document.getElementById(`selected-emoji-${index}`).value = '';
+                
+                // إزالة التأثير البصري للاختيار
+                const group = document.getElementById(`emoji-group-${index}`);
+                if(group) {
+                    group.querySelectorAll('.emoji-option').forEach(el => el.classList.remove('selected'));
+                }
+            });
+
+            // إرجاع الإطار الافتراضي (بدون إطار)
+            const noFrameBtn = document.querySelector('.emoji-gallery .emoji-btn');
+            if(noFrameBtn) selectEmojiBorder('none', noFrameBtn);
+
+            // رسالة تأكيد تفاعلية لطيفة
+            Swal.fire({
+                title: 'تم المسح بنجاح! ✨',
+                text: 'الورقة الآن نظيفة وجاهزة لاستخدامها من جديد.',
+                icon: 'success',
+                confirmButtonText: 'رائع',
+                confirmButtonColor: '#0ea5e9'
+            });
+        }
+    </script>
 </body>
 </html>
