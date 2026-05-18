@@ -1,1 +1,833 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>معلوماتي الشخصية</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <style>
+        :root {
+            --primary-color: #2f4f4f; 
+            --text-color: #2f4f4f;    
+            --bg-pastel: #cbe6f6;     
+            --white: #ffffff;
+            --emoji-size: 24px;       
+            --content-padding: 60px;  
+            
+            --btn-download-grad: linear-gradient(135deg, #2f4f4f, #416e6e);
+            --btn-story-grad: linear-gradient(135deg, #ffb703, #fb8500);
+            --btn-luck-grad: linear-gradient(135deg, #4361ee, #3f37c9);
+            --btn-clear-grad: linear-gradient(135deg, #f07167, #df4c40);
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #eef7fc 0%, #e2f1f8 50%, #ebf5ee 100%);
+            margin: 0;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* صندوق الأدوات */
+        .toolbar {
+            background-color: var(--white);
+            padding: 15px 25px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.04);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 25px;
+            width: 100%;
+            max-width: 950px;
+            justify-content: center;
+        }
+
+        .toolbar label { font-weight: bold; color: var(--primary-color); font-size: 14px; }
+        .toolbar input, .toolbar select {
+            border: 2px solid #e2e8f0; border-radius: 8px; padding: 6px 10px;
+            font-family: 'Cairo', sans-serif; font-size: 13px; outline: none; transition: 0.2s;
+        }
+        .toolbar input:focus, .toolbar select:focus { border-color: var(--primary-color); }
+
+        /* معرض الإيموجي */
+        .emoji-gallery {
+            background-color: var(--white);
+            padding: 15px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.04);
+            display: flex; gap: 12px; overflow-x: auto; margin-bottom: 25px;
+            width: 100%; max-width: 950px; justify-content: center; align-items: center;
+        }
+
+        .emoji-btn {
+            width: 52px; height: 52px; background: #f8f9fa; border: 3px solid #e2e8f0;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 26px; cursor: pointer; transition: all 0.3s; user-select: none; flex-shrink: 0;
+        }
+        .emoji-btn:hover { transform: scale(1.18) translateY(-2px); }
+        .emoji-btn.active { border-color: #e9c46a; box-shadow: 0 0 12px rgba(233, 196, 106, 0.6); background: #fff; transform: scale(1.1); }
+
+        /* الورقة والإطارات */
+        .capture-area {
+            background-color: var(--bg-pastel); color: var(--text-color); 
+            border-radius: 24px; width: 100%; max-width: 950px; 
+            box-shadow: 0 15px 35px rgba(47, 79, 79, 0.1); transition: 0.3s;
+            box-sizing: border-box; position: relative; overflow: hidden;
+        }
+
+        .emoji-border-container { position: absolute; display: flex; justify-content: space-between; align-items: center; user-select: none; pointer-events: none; }
+        .border-top { top: 15px; left: 20px; right: 20px; height: 35px; flex-direction: row; }
+        .border-bottom { bottom: 15px; left: 20px; right: 20px; height: 35px; flex-direction: row; }
+        .border-left { top: 55px; bottom: 55px; left: 20px; width: 35px; flex-direction: column; }
+        .border-right { top: 55px; bottom: 55px; right: 20px; width: 35px; flex-direction: column; }
+        .emoji-item { font-size: var(--emoji-size); line-height: 1; transition: font-size 0.2s; }
+
+        .worksheet-content { padding: var(--content-padding); box-sizing: border-box; width: 100%; }
+
+        .header-banner {
+            background: linear-gradient(135deg, #e76f51, #f4a261); color: var(--white);
+            padding: 25px; border-radius: 18px; text-align: center; margin-bottom: 30px;
+            box-shadow: 0 6px 18px rgba(231, 111, 81, 0.25);
+        }
+        .header-banner h1 { margin: 0; font-size: 38px; text-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+        .header-banner p { margin: 8px 0 0 0; font-size: 15.5px; opacity: 0.95; font-weight: bold; }
+
+        .section-card {
+            background: rgba(255, 255, 255, 0.75); border-radius: 18px; padding: 24px; margin-bottom: 25px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.02); border: 1px solid rgba(255, 255, 255, 0.6); transition: 0.3s;
+        }
+        .section-card:hover { transform: translateY(-2px); background: rgba(255, 255, 255, 0.8); }
+
+        .section-title {
+            font-size: 20px; font-weight: bold; margin-bottom: 20px; border-bottom: 2px dashed var(--text-color);
+            padding-bottom: 10px; display: flex; align-items: center; gap: 10px;
+        }
+        .section-title .title-emoji { font-size: 28px; }
+
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 15px 40px; }
+
+        .worksheet-row {
+            display: flex; align-items: center; justify-content: space-between; gap: 15px; 
+            font-size: 17px; font-weight: bold; line-height: 1.6; width: 100%;
+            border-bottom: 1px dashed rgba(47, 79, 79, 0.08); padding-bottom: 10px;
+        }
+        .worksheet-row:last-child { border-bottom: none; }
+        .worksheet-row label { white-space: nowrap; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+        .worksheet-row .label-emoji { font-size: 24px; }
+
+        /* الحقول والإدخالات */
+        input, select {
+            padding: 8px 12px; border: 2px solid #cbd5e1; border-radius: 10px; 
+            font-family: 'Cairo', sans-serif; font-size: 15px; outline: none; text-align: center; 
+            color: var(--text-color); background: rgba(255, 255, 255, 0.95); transition: 0.3s;
+            width: 110px; flex-shrink: 0; box-sizing: border-box;
+        }
+        input:focus, select:focus { border-color: var(--primary-color); background: #ffffff; }
+        input[type="text"] { width: 180px; }
+
+        /* --- إضافات ميزة الإملاء الصوتي --- */
+        .input-group { display: flex; gap: 5px; align-items: center; }
+        .mic-btn {
+            background: #edf7f7; border: 2px solid #cbd5e1; border-radius: 10px;
+            cursor: pointer; font-size: 18px; padding: 0 8px; transition: all 0.3s;
+            display: flex; align-items: center; justify-content: center; height: 42px;
+        }
+        .mic-btn:hover { background: #cbe6f6; transform: scale(1.05); }
+        .mic-btn.recording { background: #fee2e2; border-color: #fca5a5; animation: pulse 1.5s infinite; }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .date-select-container { display: flex; gap: 10px; width: 280px; flex-shrink: 0; }
+        .date-select-container select { width: 33.33% !important; height: 42px !important; }
+        #studentAge { width: 280px; font-size: 16px; }
+        
+        .gender-selector-container { display: flex; gap: 15px; align-items: center; }
+        .gender-btn {
+            font-family: 'Cairo', sans-serif; font-size: 16px; font-weight: bold;
+            padding: 10px 24px; border: 2px solid #cbd5e1; border-radius: 24px;
+            cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 8px;
+        }
+        .gender-btn:hover { transform: translateY(-2px); }
+        .gender-btn#genderBoy { background-color: #e0f2fe; border-color: #bae6fd; color: #0369a1; }
+        .gender-btn#genderBoy.active { background: linear-gradient(135deg, #0284c7, #0369a1); color: var(--white); border-color: #0284c7; }
+        .gender-btn#genderGirl { background-color: #fce7f3; border-color: #fbcfe8; color: #be185d; }
+        .gender-btn#genderGirl.active { background: linear-gradient(135deg, #db2777, #be185d); color: var(--white); border-color: #db2777; }
+        .gender-btn .btn-gender-emoji { font-size: 28px; }
+        
+        input[readonly] { background: #edf7f7; border-color: #92b5b5; cursor: not-allowed; font-weight: bold; }
+
+        .olive-badge-input {
+            font-size: 18px !important; font-weight: 700 !important; color: var(--white) !important;
+            background-color: var(--primary-color) !important; padding: 4px 10px !important;
+            border-radius: 12px !important; width: 75px !important; text-align: center !important;
+            border: 2px solid transparent !important; transition: 0.3s !important; cursor: text !important;
+        }
+        .olive-badge-input:focus { border-color: #e9c46a !important; outline: none !important; }
+
+        .equations { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+        .equation-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 20px; font-weight: bold; width: 100%; border-bottom: 1px dashed rgba(47, 79, 79, 0.08); padding-bottom: 10px; }
+        .equation-inputs-container { display: flex; align-items: center; gap: 6px; flex-shrink: 0; justify-content: center; }
+        .equation-inputs-container select { width: 75px !important; height: 42px !important; border: 2px solid var(--primary-color); border-radius: 8px; }
+        .equation-inputs-container span.operator-symbol { font-size: 18px; margin: 0 4px; }
+
+        .buttons-container { display: flex; gap: 18px; margin-top: 35px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 950px; }
+        .btn { font-family: 'Cairo', sans-serif; font-size: 16px; font-weight: bold; padding: 14px 30px; border: none; border-radius: 12px; cursor: pointer; color: var(--white); transition: 0.3s; display: flex; align-items: center; gap: 8px; }
+        .btn-download { background: var(--btn-download-grad); }
+        .btn-story { background: var(--btn-story-grad); color: #ffffff; }
+        .btn-luck { background: var(--btn-luck-grad); }
+        .btn-clear { background: var(--btn-clear-grad); }
+        .btn:hover { transform: translateY(-3px); filter: brightness(1.08); }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.55); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .modal-content { background: #ffffff; padding: 30px; border-radius: 20px; max-width: 700px; width: 90%; position: relative; text-align: right; }
+        .close-modal { position: absolute; top: 15px; left: 15px; font-size: 30px; font-weight: bold; color: #aaa; cursor: pointer; transition: color 0.2s; line-height: 1; }
+        .close-modal:hover { color: var(--primary-color); }
+
+        .story-box, .keepsake-luck-card {
+            background-color: var(--bg-pastel); color: var(--text-color); border: 6px double var(--primary-color);
+            padding: 40px; border-radius: 24px; margin-top: 15px; position: relative; overflow: hidden; box-sizing: border-box; text-align: right;
+        }
+        .keepsake-luck-card { text-align: center; }
+
+        .luck-card-title { font-size: 26px; font-weight: bold; margin-bottom: 5px; color: var(--primary-color); }
+        .luck-card-subtitle { font-size: 17px; margin-bottom: 25px; font-weight: bold; opacity: 0.9; }
+        .luck-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .luck-card-item { background: rgba(255, 255, 255, 0.9); padding: 15px; border-radius: 14px; border: 2px solid var(--primary-color); font-weight: bold; font-size: 14.5px; display: flex; flex-direction: column; gap: 8px; align-items: center; }
+        .luck-card-number { font-size: 24px; color: #ffffff; background: var(--primary-color); padding: 4px 20px; border-radius: 20px; font-weight: 700; }
+
+        .story-title { color: var(--primary-color); font-size: 26px; font-weight: bold; margin-top: 0; margin-bottom: 18px; text-align: center; border-bottom: 2px dashed var(--primary-color); padding-bottom: 12px; }
+        .story-text { font-size: 15.5px; line-height: 1.9; text-align: justify; background: rgba(255, 255, 255, 0.9); padding: 25px; border-radius: 16px; margin: 0; }
+        .modal-buttons { display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap; margin-top: 20px; }
+
+        @media (max-width: 768px) {
+            .worksheet-row { flex-direction: row; justify-content: space-between; align-items: center; }
+            .form-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 480px) {
+            .worksheet-row { flex-direction: column; align-items: flex-start; gap: 5px; }
+            input, select, .date-select-container, .equation-inputs-container { width: 100% !important; max-width: 100% !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="emoji-gallery" id="emojiGallery">
+        <div class="emoji-btn active" onclick="selectEmojiBorder('none', this)">❌</div>
+        <div class="emoji-btn" onclick="selectEmojiBorder('🌸', this)">🌸</div>
+        <div class="emoji-btn" onclick="selectEmojiBorder('🍀', this)">🍀</div>
+        <div class="emoji-btn" onclick="selectEmojiBorder('🍬', this)">🍬</div>
+        <div class="emoji-btn" onclick="selectEmojiBorder('⭐', this)">⭐</div>
+        <div class="emoji-btn" onclick="selectEmojiBorder('🎈', this)">🎈</div>
+        <div class="emoji-btn" onclick="selectEmojiBorder('🧸', this)">🧸</div>
+        <div class="emoji-btn" onclick="selectEmojiBorder('🍎', this)">🍎</div>
+        <div class="emoji-btn" onclick="selectEmojiBorder('🌼', this)">🌼</div>
+        <div class="emoji-btn" onclick="selectEmojiBorder('🌈', this)">🌈</div>
+        <div class="emoji-btn" onclick="selectEmojiBorder('✨', this)">✨</div>
+    </div>
+
+    <div class="toolbar">
+        <label>لون الخلفية:</label> <input type="color" id="bgColor" value="#cbe6f6">
+        <label>لون الخط:</label> <input type="color" id="textColor" value="#2f4f4f">
+        <label>نوع الخط:</label>
+        <select id="fontStyle">
+            <option value="'Cairo', sans-serif">Cairo</option>
+            <option value="'Tahoma', sans-serif">Tahoma</option>
+        </select>
+        <label>حجم الإطار:</label> <input type="range" id="emojiSizeInput" min="16" max="36" value="24">
+    </div>
+
+    <div id="captureArea" class="capture-area">
+        <div class="emoji-border-container border-top" id="borderTop"></div>
+        <div class="emoji-border-container border-bottom" id="borderBottom"></div>
+        <div class="emoji-border-container border-left" id="borderLeft"></div>
+        <div class="emoji-border-container border-right" id="borderRight"></div>
+
+        <div class="worksheet-content">
+            <div class="header-banner">
+                <h1 id="mainTitle">معلوماتي الشخصية</h1>
+                <p>الرياضيات تحكي قصتي الحسابية الممتعة وروتيني اليومي الساحر ✨</p>
+            </div>
+
+            <!-- بطاقة المعلومات الأساسية -->
+            <div class="section-card">
+                <div class="section-title"><span class="title-emoji">📝</span> معلوماتي الأساسية وعائلتي</div>
+                
+                <div class="worksheet-row" style="margin-bottom: 25px; justify-content: space-between; border-bottom: none;">
+                    <label><span class="label-emoji">🤔</span> هل أنت تلميذ أم تلميذة؟</label>
+                    <div class="gender-selector-container">
+                        <button type="button" id="genderBoy" class="gender-btn active" onclick="selectGender('boy')"><span class="btn-gender-emoji">🚹</span> تلميذ</button>
+                        <button type="button" id="genderGirl" class="gender-btn" onclick="selectGender('girl')"><span class="btn-gender-emoji">🚺</span> تلميذة</button>
+                    </div>
+                    <input type="hidden" id="selectedGender" value="boy">
+                </div>
+
+                <div class="form-grid">
+                    <div class="worksheet-row">
+                        <label><span class="label-emoji">👤</span> اسمي الأول هو:</label>
+                        <div class="input-group">
+                            <input type="text" id="firstName" class="required-field" placeholder="الاسم الأول">
+                            <button class="mic-btn" onclick="startDictation('firstName', this)" title="تحدث">🎙️</button>
+                        </div>
+                    </div>
+                    <div class="worksheet-row">
+                        <label><span class="label-emoji">🔢</span> ويتكون من:</label>
+                        <select id="firstNameLetters" class="required-field num-select"></select>
+                    </div>
+                    
+                    <div class="worksheet-row">
+                        <label><span class="label-emoji">🏷️</span> اسم عائلتي هو:</label>
+                        <div class="input-group">
+                            <input type="text" id="lastName" class="required-field" placeholder="العائلة">
+                            <button class="mic-btn" onclick="startDictation('lastName', this)" title="تحدث">🎙️</button>
+                        </div>
+                    </div>
+                    <div class="worksheet-row">
+                        <label><span class="label-emoji">🔢</span> ويتكون من:</label>
+                        <select id="lastNameLetters" class="required-field num-select"></select>
+                    </div>
+
+                    <div class="worksheet-row">
+                        <label><span class="label-emoji">🚹</span> عدد الإخوة لدي:</label>
+                        <select id="brothersCount" class="required-field num-select" onchange="updateLuckyNumbers()"></select>
+                    </div>
+                    <div class="worksheet-row">
+                        <label><span class="label-emoji">🚺</span> عدد الأخوات لدي:</label>
+                        <select id="sistersCount" class="required-field num-select" onchange="updateLuckyNumbers()"></select>
+                    </div>
+
+                    <div class="worksheet-row">
+                        <label><span class="label-emoji">🏫</span> الصف الدراسي:</label>
+                        <div class="input-group">
+                            <input type="text" id="studentClass" class="required-field" placeholder="مثال: الصف الثالث">
+                            <button class="mic-btn" onclick="startDictation('studentClass', this)" title="تحدث">🎙️</button>
+                        </div>
+                    </div>
+                    <div class="worksheet-row"></div>
+                </div>
+            </div>
+
+            <!-- بطاقة تاريخ ميلادي -->
+            <div class="section-card">
+                <div class="section-title"><span class="title-emoji">🧮</span> تاريخ ميلادي وأرقامي الحسابية</div>
+                <div class="worksheet-row">
+                    <label><span class="label-emoji">📅</span> تاريخ ميلادي هو:</label>
+                    <div class="date-select-container">
+                        <select id="birthDay" class="required-field" onchange="calculateAge()"></select>
+                        <select id="birthMonth" class="required-field" onchange="calculateAge()"></select>
+                        <select id="birthYear" class="required-field" onchange="calculateAge()"></select>
+                    </div>
+                </div>
+                <div class="worksheet-row" style="margin-bottom: 20px;">
+                    <label><span class="label-emoji">🎂</span> عمري الآن هو:</label>
+                    <input type="number" id="studentAge" class="required-field" readonly placeholder="محسوب تلقائياً">
+                </div>
+                
+                <div class="worksheet-row" style="margin-top: 15px; margin-bottom: 12px; border-bottom: none; justify-content: flex-start; width: 100%;">
+                    <span class="label-emoji">🔢</span> عمري بأربع طرق حسابية مختلفة:
+                </div>
+                <div class="equations">
+                    <div class="equation-row">
+                        <label>➕ الجمع:</label>
+                        <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+                            <div class="equation-inputs-container">
+                                <select class="required-field math-operand"></select><span class="operator-symbol">+</span><select class="required-field math-operand"></select>
+                            </div>
+                            <span>=</span>
+                            <input type="number" class="required-field age-result olive-badge-input" placeholder="الناتج">
+                        </div>
+                    </div>
+                    <div class="equation-row">
+                        <label>➖ الطرح:</label>
+                        <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+                            <div class="equation-inputs-container">
+                                <select class="required-field math-operand"></select><span class="operator-symbol">-</span><select class="required-field math-operand"></select>
+                            </div>
+                            <span>=</span>
+                            <input type="number" class="required-field age-result olive-badge-input" placeholder="الناتج">
+                        </div>
+                    </div>
+                    <div class="equation-row">
+                        <label>➗ القسمة:</label>
+                        <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+                            <div class="equation-inputs-container">
+                                <select class="required-field math-operand"></select><span class="operator-symbol">÷</span><select class="required-field math-operand"></select>
+                            </div>
+                            <span>=</span>
+                            <input type="number" class="required-field age-result olive-badge-input" placeholder="الناتج">
+                        </div>
+                    </div>
+                    <div class="equation-row">
+                        <label>✖️ الضرب:</label>
+                        <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+                            <div class="equation-inputs-container">
+                                <select class="required-field math-operand"></select><span class="operator-symbol">×</span><select class="required-field math-operand"></select>
+                            </div>
+                            <span>=</span>
+                            <input type="number" class="required-field age-result olive-badge-input" placeholder="الناتج">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- بطاقة روتيني اليومي -->
+            <div class="section-card">
+                <div class="section-title"><span class="title-emoji">⏰</span> روتيني اليومي ونشاطاتي</div>
+                <div class="form-grid">
+                    <div class="worksheet-row">
+                        <label><span class="label-emoji">🌅</span> أستيقظ الساعة:</label>
+                        <select id="wakeUpTime" class="required-field" onchange="calculateSleepHours()"></select>
+                    </div>
+                    <div class="worksheet-row">
+                        <label><span class="label-emoji">🚶</span> أذهب للمدرسة الساعة:</label>
+                        <select id="schoolStartTime" class="required-field"></select>
+                    </div>
+                    <div class="worksheet-row">
+                        <label><span class="label-emoji">🏠</span> أعود للمنزل الساعة:</label>
+                        <select id="schoolReturnTime" class="required-field"></select>
+                    </div>
+                    <div class="worksheet-row">
+                        <label><span class="label-emoji">🍎</span> عدد وجباتي الصحية:</label>
+                        <select id="mealsCount" class="required-field"></select>
+                    </div>
+                    <div class="worksheet-row">
+                        <label><span class="label-emoji">🌙</span> أنام الساعة:</label>
+                        <select id="bedTime" class="required-field" onchange="calculateSleepHours()"></select>
+                    </div>
+                    <div class="worksheet-row">
+                        <label><span class="label-emoji">😴</span> أقضي في النوم:</label>
+                        <input type="number" id="sleepHours" class="required-field" readonly placeholder="ساعات محسوبة">
+                    </div>
+                    <div class="worksheet-row">
+                        <label><span class="label-emoji">🎨</span> هوايتي المفضلة هي:</label>
+                        <div class="input-group">
+                            <input type="text" id="hobbyName" class="required-field" placeholder="هوايتي">
+                            <button class="mic-btn" onclick="startDictation('hobbyName', this)" title="تحدث">🎙️</button>
+                        </div>
+                    </div>
+                    <div class="worksheet-row">
+                        <label><span class="label-emoji">🔄</span> أمارسها أسبوعياً:</label>
+                        <select id="hobbyFrequency" class="required-field num-select"></select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- بطاقة قياساتي الشخصية -->
+            <div class="section-card">
+                <div class="section-title"><span class="title-emoji">📏</span> قياساتي الشخصية وابتسامتي</div>
+                <div class="form-grid">
+                    <div class="worksheet-row">
+                        <label><span class="label-emoji">👟</span> مقاس حذائي الحالي هو:</label>
+                        <select id="shoeSize" class="required-field" onchange="updateLuckyNumbers()"></select>
+                    </div>
+                    <div class="worksheet-row">
+                        <label><span class="label-emoji">🎈</span> رقمي المفضل والمميز:</label>
+                        <select id="favNumber" class="required-field" onchange="updateLuckyNumbers()"></select>
+                    </div>
+                    <div class="worksheet-row">
+                        <label><span class="label-emoji">📏</span> طولي الحالي بالسم:</label>
+                        <select id="heightCm" class="required-field" onchange="updateLuckyNumbers()"></select>
+                    </div>
+                    <div class="worksheet-row">
+                        <label><span class="label-emoji">⚖️</span> وزني الحالي كغم:</label>
+                        <select id="weightKg" class="required-field" onchange="updateLuckyNumbers()"></select>
+                    </div>
+                    <div class="worksheet-row">
+                        <label><span class="label-emoji">🦷</span> لدي أسنان تهتز بالفم:</label>
+                        <select id="looseTeeth" class="required-field num-select"></select>
+                    </div>
+                    <div class="worksheet-row">
+                        <label><span class="label-emoji">🦷</span> لدي أسنان مفقودة حالياً:</label>
+                        <select id="missingTeeth" class="required-field num-select"></select>
+                    </div>
+                    <div class="worksheet-row">
+                        <label><span class="label-emoji">👥</span> عدد أصدقائي المقربين:</label>
+                        <select id="friendsCount" class="required-field num-select" onchange="updateLuckyNumbers()"></select>
+                    </div>
+                    <div class="worksheet-row"></div>
+                </div>
+            </div>
+
+            <!-- بطاقة أيام الحظ -->
+            <div class="section-card">
+                <div class="section-title"><span class="title-emoji">🍀</span> أرقام حظي اليومية</div>
+                <div class="form-grid">
+                    <div class="worksheet-row">
+                        <label>☀️ الأحد (العمر + الحذاء):</label>
+                        <input type="number" id="luckySun" readonly placeholder="تلقائي">
+                    </div>
+                    <div class="worksheet-row">
+                        <label>🌳 الأربعاء (العمر + الأخوات):</label>
+                        <input type="number" id="luckyWed" readonly placeholder="تلقائي">
+                    </div>
+                    <div class="worksheet-row">
+                        <label>🌙 الاثنين (العمر + الأصدقاء):</label>
+                        <input type="number" id="luckyMon" readonly placeholder="تلقائي">
+                    </div>
+                    <div class="worksheet-row">
+                        <label>🚀 الخميس (رقمي المفضل):</label>
+                        <input type="number" id="luckyThu" readonly placeholder="تلقائي">
+                    </div>
+                    <div class="worksheet-row">
+                        <label>🔥 الثلاثاء (العمر + الإخوة):</label>
+                        <input type="number" id="luckyTue" readonly placeholder="تلقائي">
+                    </div>
+                    <div class="worksheet-row">
+                        <label>🎉 الجمعة (الطول + الوزن):</label>
+                        <input type="number" id="luckyFri" readonly placeholder="تلقائي">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- الأزرار السفلية التفاعلية -->
+    <div class="buttons-container">
+        <button class="btn btn-download" id="downloadBtn">📸 تحميل كصورة</button>
+        <button class="btn btn-story" id="generateStoryBtn">📖 إنشاء قصتي الحسابية</button>
+        <button class="btn btn-luck" id="generateLuckyCardBtn">🔮 بطاقة أرقام الحظ</button>
+        <button class="btn btn-clear" id="clearBtn">🧹 امسح الكل</button>
+    </div>
+
+    <!-- نافذة القصة الحسابية -->
+    <div id="storyModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-modal" id="closeModalBtn">&times;</span>
+            <div id="storyCaptureArea" class="story-box">
+                <div class="emoji-border-container border-top" id="storyBorderTop" style="top: 8px;"></div>
+                <div class="emoji-border-container border-bottom" id="storyBorderBottom" style="bottom: 8px;"></div>
+                <div class="emoji-border-container border-left" id="storyBorderLeft" style="top: 35px; bottom: 35px; left: 12px;"></div>
+                <div class="emoji-border-container border-right" id="storyBorderRight" style="top: 35px; bottom: 35px; right: 12px;"></div>
+                <h2 class="story-title" id="storyTitleEl">📖 قصتي الحسابية الشخصية</h2>
+                <p id="storyParagraph" class="story-text"></p>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-download" id="copyStoryBtn">نسخ نص القصة</button>
+                <button class="btn btn-story" id="downloadStoryImgBtn">تحميل القصة كصورة</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة بطاقة الحظ -->
+    <div id="luckyCardModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-modal" id="closeLuckyModalBtn">&times;</span>
+            <div id="luckyCardCaptureArea" class="keepsake-luck-card">
+                <div class="emoji-border-container border-top" id="cardBorderTop" style="top: 8px;"></div>
+                <div class="emoji-border-container border-bottom" id="cardBorderBottom" style="bottom: 8px;"></div>
+                <div class="emoji-border-container border-left" id="cardBorderLeft" style="top: 35px; bottom: 35px; left: 12px;"></div>
+                <div class="emoji-border-container border-right" id="cardBorderRight" style="top: 35px; bottom: 35px; right: 12px;"></div>
+                <div class="luck-card-title">🔮 بطاقة أرقام حظي السحرية 🔮</div>
+                <div class="luck-card-subtitle" id="luckCardStudentName">التلميذ البطل: </div>
+                <div class="luck-card-grid">
+                    <div class="luck-card-item"><span>☀️ الأحد (العمر + الحذاء)</span><div class="luck-card-number" id="cardSunVal">-</div></div>
+                    <div class="luck-card-item"><span>🌙 الاثنين (العمر + الأصدقاء)</span><div class="luck-card-number" id="cardMonVal">-</div></div>
+                    <div class="luck-card-item"><span>🔥 الثلاثاء (العمر + الإخوة)</span><div class="luck-card-number" id="cardTueVal">-</div></div>
+                    <div class="luck-card-item"><span>🌳 الأربعاء (العمر + الأخوات)</span><div class="luck-card-number" id="cardWedVal">-</div></div>
+                    <div class="luck-card-item"><span>🚀 الخميس (رقمي المفضل)</span><div class="luck-card-number" id="cardThuVal">-</div></div>
+                    <div class="luck-card-item"><span>🎉 الجمعة (الطول + الوزن)</span><div class="luck-card-number" id="cardFriVal">-</div></div>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-luck" id="downloadLuckyCardImgBtn">📸 تحميل بطاقة الحظ كصورة</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const captureArea = document.getElementById('captureArea');
+        const mainTitle = document.getElementById('mainTitle');
+        const root = document.documentElement;
+        let activeEmoji = 'none';
+
+        function selectGender(gender) {
+            document.getElementById('genderBoy').classList.remove('active');
+            document.getElementById('genderGirl').classList.remove('active');
+            if (gender === 'boy') {
+                document.getElementById('genderBoy').classList.add('active');
+                document.getElementById('selectedGender').value = 'boy';
+            } else {
+                document.getElementById('genderGirl').classList.add('active');
+                document.getElementById('selectedGender').value = 'girl';
+            }
+        }
+
+        function populateSelect(id, min, max, placeholder) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.innerHTML = `<option value="" disabled selected>${placeholder}</option>`;
+            for(let i = min; i <= max; i++) el.innerHTML += `<option value="${i}">${i}</option>`;
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            populateSelect('birthDay', 1, 31, 'يوم');
+            populateSelect('birthMonth', 1, 12, 'شهر');
+            const yearSelect = document.getElementById('birthYear');
+            yearSelect.innerHTML = '<option value="" disabled selected>سنة</option>';
+            for(let i = 2026; i >= 2000; i--) yearSelect.innerHTML += `<option value="${i}">${i}</option>`;
+            populateSelect('firstNameLetters', 1, 20, 'اختر');
+            populateSelect('lastNameLetters', 1, 20, 'اختر');
+            populateSelect('looseTeeth', 0, 20, 'عدد');
+            populateSelect('missingTeeth', 0, 20, 'عدد');
+            populateSelect('hobbyFrequency', 1, 10, 'مرات');
+            populateSelect('favNumber', 1, 100, 'رقم');
+            populateSelect('friendsCount', 0, 50, 'عدد');
+            populateSelect('sistersCount', 0, 10, 'عدد');
+            populateSelect('brothersCount', 0, 10, 'عدد');
+            populateSelect('heightCm', 80, 180, 'اختر');
+            populateSelect('weightKg', 15, 100, 'اختر');
+            populateSelect('shoeSize', 20, 45, 'اختر');
+            
+            document.querySelectorAll('.math-operand').forEach((select) => {
+                select.innerHTML = '<option value="" disabled selected>اختر</option>';
+                for (let i = 0; i <= 100; i++) select.innerHTML += `<option value="${i}">${i}</option>`;
+            });
+
+            const wakeSelect = document.getElementById('wakeUpTime');
+            wakeSelect.innerHTML = '<option value="" disabled selected>ساعة</option>';
+            [5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 10].forEach(t => wakeSelect.innerHTML += `<option value="${t}">${Math.floor(t)}:${t%1===0?'00':'30'}</option>`);
+
+            const schoolStartSelect = document.getElementById('schoolStartTime');
+            schoolStartSelect.innerHTML = '<option value="" disabled selected>ساعة</option>';
+            [7, 7.5, 8, 8.5].forEach(t => schoolStartSelect.innerHTML += `<option value="${t}">${Math.floor(t)}:${t%1===0?'00':'30'}</option>`);
+
+            const schoolReturnSelect = document.getElementById('schoolReturnTime');
+            schoolReturnSelect.innerHTML = '<option value="" disabled selected>ساعة</option>';
+            [12, 12.5, 13, 13.5, 14, 14.5, 15, 15.5].forEach(t => schoolReturnSelect.innerHTML += `<option value="${t}">${Math.floor(t > 12 ? t-12 : t)}:${t%1===0?'00':'30'}</option>`);
+
+            const bedSelect = document.getElementById('bedTime');
+            bedSelect.innerHTML = '<option value="" disabled selected>ساعة</option>';
+            [19, 19.5, 20, 20.5, 21, 21.5, 22, 22.5, 23, 24, 1].forEach(t => bedSelect.innerHTML += `<option value="${t}">${t===24?'12:00':Math.floor(t > 12 ? t-12 : t)}:${t%1===0?'00':'30'}</option>`);
+
+            populateSelect('mealsCount', 1, 6, 'عدد');
+            setupMathLogic(); renderEmojiBorder();
+        });
+
+        function calculateAge() {
+            const d = parseInt(document.getElementById('birthDay').value);
+            const m = parseInt(document.getElementById('birthMonth').value);
+            const y = parseInt(document.getElementById('birthYear').value);
+            if (d && m && y) {
+                let age = 2026 - y;
+                if (m > 5 || (m === 5 && d > 17)) age--;
+                document.getElementById('studentAge').value = age >= 0 ? age : 0;
+                document.querySelectorAll('.age-result').forEach(input => { if (input.value === '') input.value = age >= 0 ? age : 0; });
+                updateLuckyNumbers();
+            }
+        }
+
+        function setupMathLogic() {
+            document.querySelectorAll('.equation-row').forEach(row => {
+                const selects = row.querySelectorAll('.math-operand');
+                const resultBox = row.querySelector('.age-result');
+                const operator = row.querySelector('.operator-symbol').innerText.trim();
+                selects.forEach(select => {
+                    select.addEventListener('change', () => {
+                        const v1 = parseFloat(selects[0].value);
+                        const v2 = parseFloat(selects[1].value);
+                        if(!isNaN(v1) && !isNaN(v2)) {
+                            let res = operator === '+' ? v1 + v2 : operator === '-' ? v1 - v2 : (operator === '÷' || operator === '/') ? (v2 !== 0 ? v1 / v2 : 0) : v1 * v2;
+                            resultBox.value = Number.isInteger(res) ? res : res.toFixed(2);
+                        }
+                    });
+                });
+            });
+        }
+
+        function calculateSleepHours() {
+            const wake = parseFloat(document.getElementById('wakeUpTime').value);
+            const bed = parseFloat(document.getElementById('bedTime').value);
+            if (!isNaN(wake) && !isNaN(bed)) document.getElementById('sleepHours').value = bed > wake ? (24 - bed) + wake : wake - bed;
+        }
+
+        function updateLuckyNumbers() {
+            const age = parseInt(document.getElementById('studentAge').value) || 0;
+            const shoe = parseInt(document.getElementById('shoeSize').value) || 0;
+            const friends = parseInt(document.getElementById('friendsCount').value) || 0;
+            const brothers = parseInt(document.getElementById('brothersCount').value) || 0;
+            const sisters = parseInt(document.getElementById('sistersCount').value) || 0;
+            const height = parseInt(document.getElementById('heightCm').value) || 0;
+            const weight = parseInt(document.getElementById('weightKg').value) || 0;
+            const fav = parseInt(document.getElementById('favNumber').value) || 0;
+
+            document.getElementById('luckySun').value = age && shoe ? (age + shoe) : '';
+            document.getElementById('luckyMon').value = age && friends ? (age + friends) : '';
+            document.getElementById('luckyTue').value = age && brothers ? (age + brothers) : '';
+            document.getElementById('luckyWed').value = age && sisters ? (age + sisters) : '';
+            document.getElementById('luckyThu').value = fav ? fav : '';
+            document.getElementById('luckyFri').value = height && weight ? (height + weight) : '';
+        }
+
+        function renderEmojiBorder() {
+            const containers = [
+                { top: 'borderTop', bottom: 'borderBottom', left: 'borderLeft', right: 'borderRight', area: captureArea, scale: 40 },
+                { top: 'cardBorderTop', bottom: 'cardBorderBottom', left: 'cardBorderLeft', right: 'cardBorderRight', area: document.getElementById('luckyCardCaptureArea'), scale: 20 },
+                { top: 'storyBorderTop', bottom: 'storyBorderBottom', left: 'storyBorderLeft', right: 'storyBorderRight', area: document.getElementById('storyCaptureArea'), scale: 20 }
+            ];
+            containers.forEach(c => {
+                document.getElementById(c.top).innerHTML = ''; document.getElementById(c.bottom).innerHTML = '';
+                document.getElementById(c.left).innerHTML = ''; document.getElementById(c.right).innerHTML = '';
+                if (activeEmoji === 'none') return;
+                const emojiSize = parseInt(getComputedStyle(root).getPropertyValue('--emoji-size')) || 24;
+                const spacing = emojiSize + 12; 
+                const cols = Math.floor((c.area.offsetWidth - c.scale) / spacing);
+                const rows = Math.floor((c.area.offsetHeight - (c.scale * 2)) / spacing);
+                for (let i = 0; i < cols; i++) { document.getElementById(c.top).innerHTML += `<span class="emoji-item">${activeEmoji}</span>`; document.getElementById(c.bottom).innerHTML += `<span class="emoji-item">${activeEmoji}</span>`; }
+                for (let i = 0; i < rows; i++) { document.getElementById(c.left).innerHTML += `<span class="emoji-item">${activeEmoji}</span>`; document.getElementById(c.right).innerHTML += `<span class="emoji-item">${activeEmoji}</span>`; }
+            });
+        }
+
+        function selectEmojiBorder(emoji, element) {
+            document.querySelectorAll('.emoji-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active'); activeEmoji = emoji; renderEmojiBorder();
+        }
+
+        window.addEventListener('resize', renderEmojiBorder);
+        
+        document.getElementById('bgColor').addEventListener('input', e => { captureArea.style.backgroundColor = e.target.value; });
+        document.getElementById('textColor').addEventListener('input', e => { 
+            root.style.setProperty('--text-color', e.target.value); 
+            document.querySelectorAll('.olive-badge-input, .luck-card-number').forEach(el => el.style.backgroundColor = e.target.value);
+        });
+        document.getElementById('fontStyle').addEventListener('change', e => { captureArea.style.fontFamily = e.target.value; });
+        document.getElementById('titleSize').addEventListener('input', e => { mainTitle.style.fontSize = e.target.value + 'px'; });
+        document.getElementById('emojiSizeInput').addEventListener('input', e => { root.style.setProperty('--emoji-size', e.target.value + 'px'); renderEmojiBorder(); });
+        document.getElementById('paddingSlider').addEventListener('input', e => { root.style.setProperty('--content-padding', e.target.value + 'px'); renderEmojiBorder(); });
+
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            document.querySelectorAll('.required-field').forEach(input => { input.tagName === 'SELECT' ? input.selectedIndex = 0 : input.value = ''; });
+            updateLuckyNumbers();
+        });
+
+        function checkAllFieldsFilled() {
+            let isAllFilled = true;
+            document.querySelectorAll('.required-field').forEach(input => { if (input.value.trim() === '') isAllFilled = false; });
+            return isAllFilled;
+        }
+
+        // --- دالة الإملاء الصوتي ---
+        function startDictation(inputId, btn) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                Swal.fire('عذراً!', 'متصفحك الحالي لا يدعم ميزة الإملاء الصوتي.', 'error');
+                return;
+            }
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'ar-SA';
+            recognition.interimResults = false;
+            
+            recognition.onstart = function() { btn.classList.add('recording'); };
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                const input = document.getElementById(inputId);
+                input.value = input.value.trim() !== '' ? input.value + ' ' + transcript : transcript;
+            };
+            recognition.onend = function() { btn.classList.remove('recording'); };
+            recognition.onerror = function(event) {
+                btn.classList.remove('recording');
+                if (event.error === 'not-allowed') {
+                    Swal.fire('تنبيه أمان', 'المتصفح يمنع تشغيل المايكروفون. يرجى إعطاء الصلاحية.', 'info');
+                }
+            };
+            try { recognition.start(); } catch (err) {}
+        }
+
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            if (!checkAllFieldsFilled()) { Swal.fire('تنبيه لطيف!', 'تأكد من تعبئة جميع الخيارات!', 'info'); return; }
+            html2canvas(captureArea, { scale: 2 }).then(canvas => {
+                const link = document.createElement('a'); link.download = 'معلوماتي_الشخصية.png'; link.href = canvas.toDataURL('image/png'); link.click();
+            });
+        });
+
+        const storyModal = document.getElementById('storyModal');
+        const storyParagraph = document.getElementById('storyParagraph');
+
+        document.getElementById('generateStoryBtn').addEventListener('click', () => {
+            if (!checkAllFieldsFilled()) { Swal.fire('تنبيه لطيف!', 'يرجى ملء جميع الخيارات لصياغة قصتك!', 'warning'); return; }
+            
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const studentClass = document.getElementById('studentClass').value.trim();
+            const birthDay = document.getElementById('birthDay').value;
+            const birthMonth = document.getElementById('birthMonth').value;
+            const birthYear = document.getElementById('birthYear').value;
+            const studentAge = document.getElementById('studentAge').value;
+            
+            const wakeUpText = document.getElementById('wakeUpTime').options[document.getElementById('wakeUpTime').selectedIndex].text;
+            const schoolStartText = document.getElementById('schoolStartTime').options[document.getElementById('schoolStartTime').selectedIndex].text;
+            const schoolReturnText = document.getElementById('schoolReturnTime').options[document.getElementById('schoolReturnTime').selectedIndex].text;
+            const bedTimeText = document.getElementById('bedTime').options[document.getElementById('bedTime').selectedIndex].text;
+            
+            const mealsCount = document.getElementById('mealsCount').value;
+            const sleepHours = document.getElementById('sleepHours').value;
+            const shoeSize = document.getElementById('shoeSize').value;
+            const heightCm = document.getElementById('heightCm').value;
+            const weightKg = document.getElementById('weightKg').value;
+            const looseTeeth = document.getElementById('looseTeeth').value;
+            const missingTeeth = document.getElementById('missingTeeth').value;
+            const hobbyName = document.getElementById('hobbyName').value.trim();
+            const hobbyFrequency = document.getElementById('hobbyFrequency').value;
+            const favNumber = document.getElementById('favNumber').value;
+            const friendsCount = document.getElementById('friendsCount').value;
+            const sistersCount = document.getElementById('sistersCount').value;
+            const brothersCount = document.getElementById('brothersCount').value;
+
+            const gender = document.getElementById('selectedGender').value;
+            const roleTitle = gender === 'boy' ? 'البطل المتميز' : 'البطلة المتميزة';
+            const actionReturn = gender === 'boy' ? 'واثق الخطى' : 'واثقة الخطى';
+            const alertTitle = gender === 'boy' ? 'البطل الحسابي' : 'البطلة الحسابية';
+
+            document.getElementById('storyTitleEl').innerText = `📖 قصتي الحسابية - ${alertTitle}`;
+
+            storyParagraph.innerHTML = `مرحباً بك في عالمي المدهش! أنا ${roleTitle} 🌟 <strong>${firstName} ${lastName}</strong> 🌟، وأنا أدرس بفخر ومحبة في الصف <strong>(${studentClass})</strong>. لقد ولدت في يوم مبارك ومميز وهو <strong>${birthDay}/${birthMonth}/${birthYear}</strong>، وبفضل الله وعملية الطرح الحسابية الذكية، فإن عمري الآن هو <strong>(${studentAge})</strong> سنوات مفعمة بالطاقة والذكاء!<br><br>يومي منظم بدقة رياضية مذهلة؛ حيث أستيقظ بنشاط عند الساعة <strong>(${wakeUpText})</strong> صباحاً، وأتأهب للذهاب للمدرسة في الساعة <strong>(${schoolStartText})</strong> صباحاً للنهل من العلوم النافعة. وعندما ينتهي يومي الدراسي بنجاح، أعود لمنزلي الغالي في تمام الساعة <strong>(${schoolReturnText})</strong> ظهراً. وخلال هذا اليوم، أحافظ على حيويتي وصحتي بتناول <strong>(${mealsCount})</strong> وجبات صحية ولذيذة كل يوم لتجديد نشاطي.<br><br>أنا رائع جداً بصفاتي الجسدية المتميزة؛ فطولي الحالي هو <strong>(${heightCm})</strong> سم، ووزني هو <strong>(${weightKg})</strong> كغم، ومقاس حذائي الذي أخطو به ${actionReturn} نحو المستقبل هو <strong>(${shoeSize})</strong>. وعندما أبتسم بابتسامتي الساحرة، يظهر في فمي <strong>(${looseTeeth})</strong> أسنان تهتز وتتحرك، ولدي <strong>(${missingTeeth})</strong> أسنان مفقودة حالياً لأنني أكبر وأستبدلها بأسنان قوية دائمة!<br><br>حياتي محاطة بالمحبة والصداقة الطيبة؛ فلدي في منزلي عائلة سعيدة تضم <strong>(${brothersCount})</strong> إخوة و <strong>(${sistersCount})</strong> أخوات، كما أنني محاط بمحبة وصحبة <strong>(${friendsCount})</strong> أصدقاء رائعين نتشارك معاً البهجة والمذاكرة. هوايتي الفريدة التي أستمتع بها وأطورها هي <strong>(${hobbyName})</strong>، وأنا أمارسها بانتظام <strong>(${hobbyFrequency})</strong> مرات في الأسبوع. من بين جميع الأرقام، رقمي المفضل والمحظوظ هو <strong>(${favNumber})</strong>. وعندما يكتمل يومي الجميل، أخلد للنوم براحة وسكينة في تمام الساعة <strong>(${bedTimeText})</strong> ليلاً، لأستمتع بـ <strong>(${sleepHours})</strong> ساعات من النوم المريح الذي يبني خلاياي ويجعلني أستيقظ غداً بكل حب وعطاء!`;
+            
+            storyModal.style.display = 'flex'; setTimeout(renderEmojiBorder, 50);
+        });
+
+        document.getElementById('closeModalBtn').addEventListener('click', () => { storyModal.style.display = 'none'; });
+
+        document.getElementById('copyStoryBtn').addEventListener('click', () => {
+            navigator.clipboard.writeText(storyParagraph.innerText).then(() => {
+                Swal.fire('تم النسخ!', 'تم الحفظ في الحافظة بنجاح.', 'success');
+            });
+        });
+
+        document.getElementById('downloadStoryImgBtn').addEventListener('click', () => {
+            html2canvas(document.getElementById('storyCaptureArea'), { scale: 2 }).then(canvas => {
+                const link = document.createElement('a'); link.download = 'قصتي_الرياضية.png'; link.href = canvas.toDataURL('image/png'); link.click();
+            });
+        });
+
+        const luckyCardModal = document.getElementById('luckyCardModal');
+        document.getElementById('generateLuckyCardBtn').addEventListener('click', () => {
+            if (!checkAllFieldsFilled()) { Swal.fire('تنبيه لطيف!', 'يرجى ملء كافة الخيارات للحصول على بطاقتك!', 'warning'); return; }
+            const gender = document.getElementById('selectedGender').value;
+            document.getElementById('luckCardStudentName').innerHTML = `${gender === 'boy' ? 'البطل الحسابي' : 'البطلة الحسابية'}: 🌟 <strong>${document.getElementById('firstName').value} ${document.getElementById('lastName').value}</strong> 🌟`;
+            
+            ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'].forEach(day => {
+                document.getElementById(`card${day}Val`).innerText = document.getElementById(`lucky${day}`).value;
+            });
+            luckyCardModal.style.display = 'flex'; setTimeout(renderEmojiBorder, 50);
+        });
+
+        document.getElementById('closeLuckyModalBtn').addEventListener('click', () => luckyCardModal.style.display = 'none');
+        document.getElementById('downloadLuckyCardImgBtn').addEventListener('click', () => {
+            html2canvas(document.getElementById('luckyCardCaptureArea'), { scale: 2 }).then(canvas => {
+                const link = document.createElement('a'); link.download = 'بطاقة_حظي_السحرية.png'; link.href = canvas.toDataURL('image/png'); link.click();
+            });
+        });
+
+        window.addEventListener('click', e => { if (e.target === storyModal) storyModal.style.display = 'none'; if (e.target === luckyCardModal) luckyCardModal.style.display = 'none'; });
+    </script>
+</body>
+</html>
