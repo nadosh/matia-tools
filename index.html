@@ -14,37 +14,45 @@
             --text-muted: #334155;
         }
 
-        body {
-            font-family: 'Cairo', sans-serif;
-            /* تدرج لوني مريح وممتع بصرياً للأطفال يحاكي حوض الأسماك الهادئ */
+        /* تثبيت الخلفية المتدرجة على كامل الصفحة والـ HTML لمنع أي تسرب للون الأبيض */
+        html, body {
             background: linear-gradient(180deg, #7dd3fc 0%, #0ea5e9 40%, #0369a1 100%);
             margin: 0;
-            padding: 0 0 40px 0; /* تم إزالة الـ Padding العلوي ليظهر موج السطح ملتصقاً بأعلى الشاشة */
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            padding: 0; /* تمت إزالة الهوامش بالكامل ليلتصق الفوتر والسطح بحواف الشاشة */
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
             overflow-x: hidden; 
             position: relative;
         }
 
-        /* --- تأثير أمواج سطح الماء في أعلى الصفحة (مستوحى من Neal.fun) --- */
+        /* --- تأثير أمواج سطح الماء في أعلى الصفحة (مستوحى من Neal.fun وبانسياب مطلق) --- */
         .header-waves {
             position: relative;
             width: 100%;
-            height: 120px;
-            background: #ffffff; /* السماء البيضاء فوق سطح الماء */
+            height: 140px;
+            background: transparent; 
             margin: 0;
             padding: 0;
             overflow: hidden;
             z-index: 10;
+            
+            /* السحر الحقيقي: قناع تدريجي يجعل نهاية الأمواج تذوب وتتلاشى تماماً في الخلفية الزرقاء */
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
         }
 
         .waves {
             position: absolute;
             bottom: 0;
             width: 100%;
-            height: 80px;
+            height: 90px;
             min-height: 40px;
             max-height: 100px;
         }
@@ -71,12 +79,8 @@
         }
 
         @keyframes move-forever {
-            0% {
-                transform: translate3d(-90px,0,0);
-            }
-            100% { 
-                transform: translate3d(85px,0,0);
-            }
+            0% { transform: translate3d(-90px,0,0); }
+            100% { transform: translate3d(85px,0,0); }
         }
 
         /* حاوية الأكفاريوم (الأسماك والفقاعات الخلفية الثابتة) */
@@ -133,39 +137,62 @@
             z-index: 50; 
         } 
 
-        /* --- حاوية قاع الصفحة المطورة لتبدو كالرمل (Seabed Footer) --- */
+        /* --- حاوية قاع الصفحة المطورة المنسابة والكاملة (Seabed Full-Width Footer) --- */
         .seabed-footer {
-            margin-top: 100px; 
-            width: 100%; 
-            max-width: 950px; 
+            margin-top: 120px; 
+            width: 100%; /* تمدد كامل بعرض الصفحة لإلغاء المظهر الدخيل المستطيل */
             position: relative; 
-            padding: 80px 20px 40px 20px; 
-            /* تدرج رملي دافئ يوحي برمال قاع البحر المضيئة */
-            background: linear-gradient(180deg, transparent 0%, rgba(253, 224, 71, 0.09) 100%);
-            border-top: 2px dashed rgba(255, 255, 255, 0.3);
-            border-radius: 40px 40px 0 0;
+            padding: 90px 20px 50px 20px; 
+            /* تدرج لوني مائي انسيابي ينحدر بلطف تام إلى أزرق داكن سحيق كأعماق المحيط الفاخرة */
+            background: linear-gradient(180deg, #0369a1 0%, #075985 30%, #0f172a 70%, #020617 100%);
             box-sizing: border-box;
             display: flex;
-            flex-direction: column; /* ترتيب العناصر عمودياً لعدم التداخل */
+            flex-direction: column; 
             justify-content: center;
             align-items: center;
             gap: 15px;
+            z-index: 10;
         }
 
-        /* كائنات قاع البحر النابضة بالتنفس مستقرة الآن داخل الفوتر */
+        /* أمواج القاع الخاصة بالفوتر لتمويجه مع الموقع بجمالية مطلقة */
+        .footer-waves {
+            position: absolute;
+            top: -79px; /* ترتفع لتغطي نقطة التلاقي بين المحيط والفوتر */
+            left: 0;
+            width: 100%;
+            height: 80px;
+            overflow: hidden;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .parallax-bottom > use {
+            animation: move-forever-bottom 25s cubic-bezier(.55,.5,.45,.5) infinite;
+        }
+        .parallax-bottom > use:nth-child(1) { animation-delay: -2s; animation-duration: 9s; }
+        .parallax-bottom > use:nth-child(2) { animation-delay: -4s; animation-duration: 13s; }
+        .parallax-bottom > use:nth-child(3) { animation-delay: -3s; animation-duration: 17s; }
+        .parallax-bottom > use:nth-child(4) { animation-delay: -5s; animation-duration: 21s; }
+
+        @keyframes move-forever-bottom {
+            0% { transform: translate3d(-90px,0,0); }
+            100% { transform: translate3d(85px,0,0); }
+        }
+
+        /* كائنات قاع البحر النابضة بالتنفس مستقرة الآن داخل الفوتر المنساب */
         .bottom-creature {
             position: absolute; 
             user-select: none; 
             animation: pulseScale 4s ease-in-out infinite; 
             z-index: 1;
         }
-        .c-crab { right: 5%; bottom: 25px; font-size: 65px; animation-delay: 0s; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15)); }
-        .c-shell { right: 18%; bottom: 15px; font-size: 55px; animation-delay: 1s; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15)); }
+        .c-crab { right: 8%; bottom: 35px; font-size: 65px; animation-delay: 0s; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15)); }
+        .c-shell { right: 22%; bottom: 25px; font-size: 55px; animation-delay: 1s; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15)); }
         
         /* نجم البحر في أقصى اليسار مع فلتر التلوين للأحمر البني المطور */
         .c-star { 
-            left: 5%; 
-            bottom: 30px; 
+            left: 8%; 
+            bottom: 35px; 
             font-size: 60px; 
             animation-delay: 2s; 
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)) sepia(0.7) hue-rotate(330deg) saturate(3) brightness(0.7); 
@@ -191,7 +218,7 @@
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            padding: 0 20px;
+            padding: 0; /* تم إلغاء البادينغ ليتمدد الفوتر أفقياً بالكامل */
             box-sizing: border-box;
         }
         
@@ -201,6 +228,7 @@
             margin-bottom: 40px; 
             max-width: 800px; 
             animation: fadeInDown 1s ease; 
+            padding: 0 20px; /* لحماية النصوص وتوسيطها */
         }
         
         .header h1 { 
@@ -240,6 +268,8 @@
             gap: 25px; 
             width: 100%; 
             max-width: 1100px; 
+            padding: 0 20px; /* بادينغ مخصص للكروت لمنع تلامسها بالحواف */
+            box-sizing: border-box;
         }
         
         /* تصميم كروت الأنشطة بتأثير الزجاج الحديث (Glassmorphism) */
@@ -307,7 +337,7 @@
         }
         .site-footer span { color: #fef08a; }
 
-        /* تصميم زر التواصل بالبريد الإلكتروني الزجاجي الساحر */
+        /* تصميم زر التواصل بالبريد الإلكتروني الزجاجي الساحر الملائم للرمال المتوهجة */
         .contact-email-btn {
             display: inline-flex;
             align-items: center;
@@ -333,7 +363,7 @@
             background: rgba(255, 255, 255, 0.25);
             border-color: rgba(255, 255, 255, 0.5);
             transform: translateY(-3px) scale(1.03);
-            box-shadow: 0 8px 20px rgba(254, 240, 138, 0.15);
+            box-shadow: 0 8px 20px rgba(56, 189, 248, 0.25); /* توهج ضوئي مائي */
             color: #fef08a;
         }
 
@@ -362,18 +392,36 @@
 </head>
 <body>
 
-    <!-- أمواج السطح المتحركة في أعلى الصفحة (تخلق سماءً بيضاء كـ Neal.fun وتندمج مع أزرق المحيط) -->
+    <!-- أمواج السطح المتحركة في أعلى الصفحة -->
     <div class="header-waves">
         <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
         viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
             <defs>
                 <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
+                
+                <!-- تدرجات ذوبان مخصصة لكل موجة لتختفي تدريجياً وبنسب مئوية مريحة للعين دون أي خطوط حادة -->
+                <linearGradient id="wave-grad-1" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#ffffff" stop-opacity="0.25" />
+                    <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+                </linearGradient>
+                <linearGradient id="wave-grad-2" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#ffffff" stop-opacity="0.4" />
+                    <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+                </linearGradient>
+                <linearGradient id="wave-grad-3" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#ffffff" stop-opacity="0.5" />
+                    <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+                </linearGradient>
+                <linearGradient id="wave-grad-4" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#ffffff" stop-opacity="0.3" />
+                    <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+                </linearGradient>
             </defs>
             <g class="parallax">
-                <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(125, 211, 252, 0.3)" />
-                <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(125, 211, 252, 0.5)" />
-                <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(125, 211, 252, 0.8)" />
-                <use xlink:href="#gentle-wave" x="48" y="7" fill="#7dd3fc" /> <!-- هذا اللون يندمج تماماً مع بداية تدرج الـ Body -->
+                <use xlink:href="#gentle-wave" x="48" y="0" fill="url(#wave-grad-1)" />
+                <use xlink:href="#gentle-wave" x="48" y="3" fill="url(#wave-grad-2)" />
+                <use xlink:href="#gentle-wave" x="48" y="5" fill="url(#wave-grad-3)" />
+                <use xlink:href="#gentle-wave" x="48" y="7" fill="url(#wave-grad-4)" />
             </g>
         </svg>
     </div>
@@ -399,7 +447,7 @@
         <div class="header">
             <h1>ماتيا الجليل</h1>
             <div class="header-subtitle">منطقة الإبداع والتمكين 🌟</div>
-            <p>مساحة آمنة وممتعة للأبطال للتعبير عن أنفسهم، استكشاف مشاعرهم، وصنع أجمل الذكريات. اختر نشاطك المفضل لتبدأ رحلتك الحركية والذهنية الفريدة!</p>
+            <p>مساحة آمنة وممتعة للأبطال للتعبير عن أنهم، استكشاف مشاعرهم، وصنع أجمل الذكريات. اختر نشاطك المفضل لتبدأ رحلتك الحركية والذهنية الفريدة!</p>
         </div>
 
         <div class="cards-grid">
@@ -436,8 +484,37 @@
             </a>
         </div>
 
-        <!-- تذييل الصفحة المطور (Seabed) حيث ترسو الكائنات مع اسمكِ الرائع وزر الاتصال -->
+        <!-- تذييل الصفحة المطور بالكامل لتبدو كأعماق المحيط السحرية الزرقاء المنسابة -->
         <div class="seabed-footer">
+            <!-- أمواج القاع السحرية المنسابة (تدمج الفوتر بشكل دائري وانسيابي مع أزرق الأعماق) -->
+            <div class="footer-waves">
+                <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+                    <defs>
+                        <path id="gentle-wave-bottom" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
+                        
+                        <!-- تدرجات ذوبان قاع البحر من الأزرق المتوسط إلى الأعماق الزرقاء المظلمة والمضيئة حسياً -->
+                        <linearGradient id="footer-wave-grad-1" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#0369a1" stop-opacity="0.8" />
+                            <stop offset="100%" stop-color="#075985" stop-opacity="1" />
+                        </linearGradient>
+                        <linearGradient id="footer-wave-grad-2" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.25" /> <!-- توهج إضاءة حيوية زرقاء ناعمة مريحة للحواس -->
+                            <stop offset="100%" stop-color="#0f172a" stop-opacity="0.8" />
+                        </linearGradient>
+                        <linearGradient id="footer-wave-grad-3" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#075985" stop-opacity="0.5" />
+                            <stop offset="100%" stop-color="#020617" stop-opacity="1" />
+                        </linearGradient>
+                    </defs>
+                    <g class="parallax-bottom">
+                        <use xlink:href="#gentle-wave-bottom" x="48" y="0" fill="url(#footer-wave-grad-1)" />
+                        <use xlink:href="#gentle-wave-bottom" x="48" y="3" fill="url(#footer-wave-grad-2)" />
+                        <use xlink:href="#gentle-wave-bottom" x="48" y="5" fill="url(#footer-wave-grad-3)" />
+                    </g>
+                </svg>
+            </div>
+
             <!-- كائنات القاع الساحلية النابضة بهدوء وتأثير الـ 3D -->
             <div class="bottom-creature c-crab" title="سلطعون">🦀</div>
             <div class="bottom-creature c-shell" title="صدفة">🐚</div>
