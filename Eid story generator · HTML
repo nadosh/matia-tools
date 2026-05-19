@@ -750,16 +750,23 @@
         let selectedGender = 'male';
         let selectedDifficulty = 'simple';
 
+        // متغير عام لتخزين كائن التعرف على الصوت
+        let currentRecognition = null;
+
         // دالة الإملاء الصوتي (تحويل الكلام إلى نص)
         function startDictation(inputId, btn) {
-            console.log('🎙️ بدء المايكروفون...');
-            console.log('Input ID:', inputId);
-            
+            // إذا كان التسجيل جارياً، أوقفه
+            if (currentRecognition) {
+                currentRecognition.stop();
+                currentRecognition = null;
+                btn.classList.remove('recording');
+                return;
+            }
+
             // التحقق من دعم المتصفح لميزة التعرف على الصوت
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             
             if (!SpeechRecognition) {
-                console.error('❌ المتصفح لا يدعم التعرف على الصوت');
                 Swal.fire({
                     title: 'عذراً!',
                     html: 'متصفحك الحالي لا يدعم ميزة الإملاء الصوتي.<br><br>يرجى استخدام متصفح:<br>• Google Chrome<br>• Microsoft Edge',
@@ -770,114 +777,83 @@
                 return;
             }
 
-            console.log('✅ المتصفح يدعم التعرف على الصوت');
-
             const recognition = new SpeechRecognition();
-            recognition.lang = 'ar-SA'; // تعيين اللغة العربية
+            currentRecognition = recognition;
+            
+            recognition.lang = 'ar-SA';
             recognition.interimResults = false;
             recognition.maxAlternatives = 1;
-            recognition.continuous = false;
 
             const inputElement = document.getElementById(inputId);
 
-            if (!inputElement) {
-                console.error('❌ لم يتم العثور على عنصر الإدخال');
-                return;
-            }
-
             // عند بدء التسجيل
             recognition.onstart = function() {
-                console.log('🔴 بدأ التسجيل...');
                 btn.classList.add('recording');
-                btn.title = "جارٍ الاستماع... تحدث الآن 🔴";
-                
-                // إظهار رسالة توضيحية
-                Swal.fire({
-                    toast: true,
-                    position: 'top',
-                    icon: 'info',
-                    title: '🎙️ تحدث الآن...',
-                    showConfirmButton: false,
-                    timer: 3000,
-                    background: '#fee2e2',
-                    timerProgressBar: true
-                });
+                btn.title = "اضغط لإيقاف التسجيل";
             };
 
             // عند التقاط الصوت وتحويله لنص
             recognition.onresult = function(event) {
-                console.log('✅ تم التقاط الصوت');
                 const transcript = event.results[0][0].transcript;
-                console.log('النص المحول:', transcript);
                 
-                // إذا كان هناك نص سابق، نضيف مسافة ثم النص الجديد
                 if(inputElement.value.trim() !== '') {
                     inputElement.value += ' ' + transcript;
                 } else {
                     inputElement.value = transcript;
                 }
 
-                // رسالة نجاح
                 Swal.fire({
                     toast: true,
                     position: 'top-end',
                     icon: 'success',
-                    title: 'تم تحويل الصوت بنجاح! ✅',
+                    title: 'تم! ✅',
                     showConfirmButton: false,
-                    timer: 2000,
-                    timerProgressBar: true
+                    timer: 1500
                 });
             };
 
             // عند انتهاء التسجيل
             recognition.onend = function() {
-                console.log('⏹️ انتهى التسجيل');
                 btn.classList.remove('recording');
                 btn.title = "اضغط للتحدث بدلاً من الكتابة";
+                currentRecognition = null;
             };
 
             // عند حدوث خطأ
             recognition.onerror = function(event) {
-                console.error('❌ خطأ في التعرف على الصوت:', event.error);
                 btn.classList.remove('recording');
                 btn.title = "اضغط للتحدث بدلاً من الكتابة";
-                
-                let errorMessage = 'حدث خطأ أثناء التعرف على الصوت.';
-                let errorIcon = 'error';
+                currentRecognition = null;
                 
                 if (event.error === 'not-allowed' || event.error === 'permission-denied') {
-                    errorMessage = 'يرجى السماح للموقع بالوصول إلى المايكروفون من إعدادات المتصفح.<br><br>في Chrome: اضغط على أيقونة القفل 🔒 بجانب العنوان واختر "السماح" للمايكروفون.';
-                    errorIcon = 'warning';
+                    Swal.fire({
+                        title: 'تم رفض الإذن',
+                        html: 'يرجى السماح بالوصول للمايكروفون:<br><br>1. اضغط على الأيقونة بجانب رابط الموقع<br>2. اختر "السماح" للمايكروفون<br>3. أعد تحميل الصفحة',
+                        icon: 'warning',
+                        confirmButtonText: 'حسناً',
+                        confirmButtonColor: '#16a34a'
+                    });
                 } else if (event.error === 'no-speech') {
-                    errorMessage = 'لم يتم التقاط أي صوت. حاول مرة أخرى والتحدث بوضوح.';
-                    errorIcon = 'info';
-                } else if (event.error === 'network') {
-                    errorMessage = 'تحتاج إلى اتصال بالإنترنت لاستخدام هذه الميزة.';
-                } else if (event.error === 'aborted') {
-                    errorMessage = 'تم إلغاء التسجيل.';
-                    errorIcon = 'info';
+                    Swal.fire({
+                        toast: true,
+                        position: 'top',
+                        icon: 'info',
+                        title: 'لم أسمع صوتاً، حاول مرة أخرى',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
                 }
-
-                Swal.fire({
-                    title: 'تنبيه',
-                    html: errorMessage,
-                    icon: errorIcon,
-                    confirmButtonText: 'حسناً',
-                    confirmButtonColor: '#16a34a'
-                });
             };
 
             // تشغيل المايكروفون
             try {
-                console.log('🎤 محاولة بدء التسجيل...');
                 recognition.start();
             } catch (err) {
-                console.error('❌ خطأ في بدء التعرف على الصوت:', err);
                 btn.classList.remove('recording');
-                
+                currentRecognition = null;
                 Swal.fire({
                     title: 'خطأ',
-                    text: 'لم نتمكن من تشغيل المايكروفون. تأكد من أن المايكروفون متصل ويعمل.',
+                    text: 'حدث خطأ في تشغيل المايكروفون',
                     icon: 'error',
                     confirmButtonText: 'حسناً',
                     confirmButtonColor: '#16a34a'
