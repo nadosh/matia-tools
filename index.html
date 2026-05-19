@@ -19,13 +19,64 @@
             /* تدرج لوني مريح وممتع بصرياً للأطفال يحاكي حوض الأسماك الهادئ */
             background: linear-gradient(180deg, #7dd3fc 0%, #0ea5e9 40%, #0369a1 100%);
             margin: 0;
-            padding: 40px 20px;
+            padding: 0 0 40px 0; /* تم إزالة الـ Padding العلوي ليظهر موج السطح ملتصقاً بأعلى الشاشة */
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
             overflow-x: hidden; 
             position: relative;
+        }
+
+        /* --- تأثير أمواج سطح الماء في أعلى الصفحة (مستوحى من Neal.fun) --- */
+        .header-waves {
+            position: relative;
+            width: 100%;
+            height: 120px;
+            background: #ffffff; /* السماء البيضاء فوق سطح الماء */
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .waves {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 80px;
+            min-height: 40px;
+            max-height: 100px;
+        }
+
+        /* حركات التداخل البصري للأمواج */
+        .parallax > use {
+            animation: move-forever 25s cubic-bezier(.55,.5,.45,.5) infinite;
+        }
+        .parallax > use:nth-child(1) {
+            animation-delay: -2s;
+            animation-duration: 8s;
+        }
+        .parallax > use:nth-child(2) {
+            animation-delay: -3s;
+            animation-duration: 12s;
+        }
+        .parallax > use:nth-child(3) {
+            animation-delay: -4s;
+            animation-duration: 16s;
+        }
+        .parallax > use:nth-child(4) {
+            animation-delay: -5s;
+            animation-duration: 22s;
+        }
+
+        @keyframes move-forever {
+            0% {
+                transform: translate3d(-90px,0,0);
+            }
+            100% { 
+                transform: translate3d(85px,0,0);
+            }
         }
 
         /* حاوية الأكفاريوم (الأسماك والفقاعات الخلفية الثابتة) */
@@ -82,18 +133,23 @@
             z-index: 50; 
         } 
 
-        /* --- حاوية قاع الصفحة المطورة (Seabed Footer) --- */
+        /* --- حاوية قاع الصفحة المطورة لتبدو كالرمل (Seabed Footer) --- */
         .seabed-footer {
-            margin-top: 80px; 
+            margin-top: 100px; 
             width: 100%; 
             max-width: 950px; 
-            position: relative; /* لتحديد تموضع الكائنات بداخلها بمرونة */
-            padding: 70px 20px 30px 20px; /* تباعد كافٍ لحماية النص والكائنات */
+            position: relative; 
+            padding: 80px 20px 40px 20px; 
+            /* تدرج رملي دافئ يوحي برمال قاع البحر المضيئة */
+            background: linear-gradient(180deg, transparent 0%, rgba(253, 224, 71, 0.09) 100%);
             border-top: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 40px 40px 0 0;
             box-sizing: border-box;
             display: flex;
+            flex-direction: column; /* ترتيب العناصر عمودياً لعدم التداخل */
             justify-content: center;
             align-items: center;
+            gap: 15px;
         }
 
         /* كائنات قاع البحر النابضة بالتنفس مستقرة الآن داخل الفوتر */
@@ -103,42 +159,17 @@
             animation: pulseScale 4s ease-in-out infinite; 
             z-index: 1;
         }
-        .c-crab { right: 5%; bottom: 15px; font-size: 65px; animation-delay: 0s; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15)); }
-        .c-shell { right: 18%; bottom: 5px; font-size: 55px; animation-delay: 1s; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15)); }
+        .c-crab { right: 5%; bottom: 25px; font-size: 65px; animation-delay: 0s; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15)); }
+        .c-shell { right: 18%; bottom: 15px; font-size: 55px; animation-delay: 1s; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15)); }
         
         /* نجم البحر في أقصى اليسار مع فلتر التلوين للأحمر البني المطور */
         .c-star { 
             left: 5%; 
-            bottom: 20px; 
+            bottom: 30px; 
             font-size: 60px; 
             animation-delay: 2s; 
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)) sepia(0.7) hue-rotate(330deg) saturate(3) brightness(0.7); 
         }
-
-        /* --- زر الصوت الزجاجي الأنيق --- */
-        .sound-btn {
-            position: fixed; 
-            top: 20px; 
-            right: 20px; 
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(8px); 
-            border: 2px solid rgba(255, 255, 255, 0.8);
-            border-radius: 30px; 
-            padding: 10px 20px; 
-            font-family: 'Cairo', sans-serif;
-            font-size: 16px; 
-            font-weight: bold; 
-            color: #0369a1; 
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
-            z-index: 100; 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            transition: all 0.3s;
-        }
-        .sound-btn:hover { background: #ffffff; transform: scale(1.05); }
-        .sound-btn.playing { background: #e0f2fe; border-color: #7dd3fc; }
 
         /* تأثيرات الحركة والسباحة الدائرية */
         @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 0; } 10% { opacity: 0.8; } 100% { transform: translateY(-120vh) scale(1.5); opacity: 0; } }
@@ -160,41 +191,45 @@
             display: flex; 
             flex-direction: column; 
             align-items: center; 
+            padding: 0 20px;
+            box-sizing: border-box;
         }
         
         .header { 
             text-align: center; 
+            margin-top: 30px;
             margin-bottom: 40px; 
             max-width: 800px; 
             animation: fadeInDown 1s ease; 
         }
         
-        .header-badge { 
-            background: rgba(255, 255, 255, 0.9); 
-            color: #0369a1; 
-            padding: 8px 24px; 
-            border-radius: 30px; 
-            font-size: 15px; 
-            font-weight: bold; 
-            display: inline-block; 
-            margin-bottom: 15px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
-        }
-        
         .header h1 { 
             color: #ffffff; 
-            font-size: 46px; 
+            font-size: 54px; 
             font-weight: 900; 
-            margin: 0 0 15px 0; 
-            text-shadow: 0 4px 10px rgba(0,0,0,0.2); 
+            margin: 0 0 10px 0; 
+            text-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+            letter-spacing: 1px;
+        }
+
+        .header-subtitle {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.9);
+            color: #0284c7; /* لون خط متناسق مع مياه البحر السطحية */
+            padding: 8px 30px;
+            border-radius: 30px;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 22px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
         }
         
         .header p { 
             color: #f0f9ff; 
             font-size: 19px; 
-            line-height: 1.6; 
+            line-height: 1.7; 
             margin: 0; 
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            text-shadow: 0 2px 5px rgba(0,0,0,0.15); 
             font-weight: bold; 
         }
         
@@ -272,42 +307,76 @@
         }
         .site-footer span { color: #fef08a; }
 
+        /* تصميم زر التواصل بالبريد الإلكتروني الزجاجي الساحر */
+        .contact-email-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: #f0f9ff;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            padding: 10px 24px;
+            border-radius: 25px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+            z-index: 5;
+            font-family: 'Cairo', sans-serif;
+            margin-top: 5px;
+        }
+
+        .contact-email-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 8px 20px rgba(254, 240, 138, 0.15);
+            color: #fef08a;
+        }
+
+        .contact-email-btn span {
+            color: #fef08a;
+            font-weight: 900;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
         @media (max-width: 600px) { 
-            .header h1 { font-size: 34px; } 
+            .header h1 { font-size: 38px; } 
+            .header-subtitle { font-size: 17px; padding: 6px 20px; }
+            .header p { font-size: 16px; }
             .card { padding: 30px 20px; } 
             .fish { font-size: 55px; } 
             
             /* تصغير كائنات القاع في الجوال لكي لا تغطي على النص بشكل غير مرتب */
-            .c-crab { font-size: 45px; right: 2%; bottom: 10px; }
-            .c-shell { font-size: 35px; right: 15%; bottom: 5px; }
-            .c-star { font-size: 40px; left: 2%; bottom: 12px; }
-            .seabed-footer { padding: 50px 10px 20px 10px; margin-top: 40px; }
+            .c-crab { font-size: 45px; right: 2%; bottom: 15px; }
+            .c-shell { font-size: 35px; right: 15%; bottom: 10px; }
+            .c-star { font-size: 40px; left: 2%; bottom: 18px; }
+            .seabed-footer { padding: 60px 10px 30px 10px; margin-top: 50px; }
             .site-footer { font-size: 15px; }
-        }
-
-        /* تنبيه مخصص مدمج بالصفحة لشريط الإعلانات أو الأخطراء لتجنب استخدام alert() */
-        .custom-toast {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: rgba(15, 23, 42, 0.9);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 30px;
-            font-weight: bold;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            z-index: 2000;
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            pointer-events: none;
-            font-size: 15px;
-        }
-        .custom-toast.show {
-            transform: translateX(-50%) translateY(0);
+            .contact-email-btn { font-size: 13.5px; padding: 8px 18px; }
         }
     </style>
 </head>
 <body>
+
+    <!-- أمواج السطح المتحركة في أعلى الصفحة (تخلق سماءً بيضاء كـ Neal.fun وتندمج مع أزرق المحيط) -->
+    <div class="header-waves">
+        <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+        viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+            <defs>
+                <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
+            </defs>
+            <g class="parallax">
+                <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(125, 211, 252, 0.3)" />
+                <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(125, 211, 252, 0.5)" />
+                <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(125, 211, 252, 0.8)" />
+                <use xlink:href="#gentle-wave" x="48" y="7" fill="#7dd3fc" /> <!-- هذا اللون يندمج تماماً مع بداية تدرج الـ Body -->
+            </g>
+        </svg>
+    </div>
 
     <!-- حوض الأسماك والبيئة المائية الخلفية (فقط الأسماك والفقاعات العائمة) -->
     <div class="aquarium">
@@ -325,25 +394,12 @@
     <!-- قنديل البحر الرائع يمر في منتصف الشاشة وفوق الكروت كالعنصر السحري العائم -->
     <div class="v-creature v2" title="قنديل البحر">🪼</div>
 
-    <!-- عنصر الصوت (أمواج بحر هادئة وناعمة جداً ملائمة للاسترخاء التام) -->
-    <audio id="oceanAudio" loop preload="auto" crossorigin="anonymous">
-        <source src="https://cdn.freesound.org/previews/404/404329_5121236-lq.mp3" type="audio/mpeg">
-    </audio>
-
-    <!-- زر تشغيل الصوت العلوي الثابت -->
-    <button class="sound-btn" id="soundToggleBtn" onclick="toggleSound()">
-        🔊 تشغيل صوت البحر
-    </button>
-
-    <!-- تنبيه مخصص للرسائل بدون استخدام alert() المزعج -->
-    <div class="custom-toast" id="customToast">يرجى تشغيل الصوت من جهازك أولاً 🔊</div>
-
-    <!-- المحتوى الفعلي المنسق للموقع -->
+    <!-- المحتوى الفعلي المنسق للموقع البوابة -->
     <div class="content-wrapper">
         <div class="header">
-            <div class="header-badge">🌊 مرحباً بك في عالم الإبداع والهدوء</div>
-            <h1>بوابة أنشطة ماتيا الجليل</h1>
-            <p>مساحة آمنة وممتعة للأبطال للتعبير عن أنفسهم، استكشاف مشاعرهم، وصنع أجمل الذكريات. خذ نفساً عميقاً واختر نشاطك المفضل لتبدأ رحلتك!</p>
+            <h1>ماتيا الجليل</h1>
+            <div class="header-subtitle">منطقة الإبداع والتمكين 🌟</div>
+            <p>مساحة آمنة وممتعة للأبطال للتعبير عن أنفسهم، استكشاف مشاعرهم، وصنع أجمل الذكريات. اختر نشاطك المفضل لتبدأ رحلتك الحركية والذهنية الفريدة!</p>
         </div>
 
         <div class="cards-grid">
@@ -380,58 +436,24 @@
             </a>
         </div>
 
-        <!-- تذييل الصفحة المطور (Seabed) حيث ترسو الكائنات مع اسمكِ الرائع -->
+        <!-- تذييل الصفحة المطور (Seabed) حيث ترسو الكائنات مع اسمكِ الرائع وزر الاتصال -->
         <div class="seabed-footer">
             <!-- كائنات القاع الساحلية النابضة بهدوء وتأثير الـ 3D -->
             <div class="bottom-creature c-crab" title="سلطعون">🦀</div>
             <div class="bottom-creature c-shell" title="صدفة">🐚</div>
             <div class="bottom-creature c-star" title="نجم بحر">⭐</div>
 
+            <!-- اسم المبرمجة والمؤسسة -->
             <div class="site-footer">
                 تطوير وبرمجة <span>ناديا الحاج</span> لصالح مؤسسة <span>ماتيا الجليل</span>
             </div>
+
+            <!-- زر البريد الإلكتروني المطور للتواصل بعد التحديث -->
+            <a href="mailto:haj.nadia@gmail.com" class="contact-email-btn" title="اضغط للتواصل معنا عبر البريد الإلكتروني">
+                ✉️ للتواصل والاستفسار: <span>haj.nadia@gmail.com</span>
+            </a>
         </div>
     </div>
 
-    <!-- أكواد جافاسكريبت للتحكم بالصوت والتنبيه المخصص -->
-    <script>
-        const audio = document.getElementById('oceanAudio');
-        const soundBtn = document.getElementById('soundToggleBtn');
-        const toast = document.getElementById('customToast');
-        let isPlaying = false;
-
-        function showToast(message) {
-            toast.innerText = message;
-            toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 4000);
-        }
-
-        function toggleSound() {
-            if (isPlaying) {
-                audio.pause();
-                soundBtn.innerHTML = '🔊 تشغيل صوت البحر';
-                soundBtn.classList.remove('playing');
-                isPlaying = false;
-            } else {
-                audio.volume = 0.3; // تعيين مستوى مريح جداً وصامت كهمس هادئ (30%)
-                
-                let playPromise = audio.play();
-                
-                if (playPromise !== undefined) {
-                    playPromise.then(_ => {
-                        soundBtn.innerHTML = '🔇 إيقاف صوت البحر';
-                        soundBtn.classList.add('playing');
-                        isPlaying = true;
-                    })
-                    .catch(error => {
-                        console.error("مشكلة في تشغيل الصوت:", error);
-                        showToast("عذراً! يبدو أن متصفحك يمنع التشغيل تلقائياً. يرجى إعطاء صلاحية الصوت.");
-                    });
-                }
-            }
-        }
-    </script>
 </body>
 </html>
