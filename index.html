@@ -24,7 +24,6 @@
 
         body {
             font-family: 'Cairo', sans-serif;
-            padding: 0; /* تمت إزالة الهوامش بالكامل ليلتصق الفوتر والسطح بحواف الشاشة */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -83,7 +82,7 @@
             100% { transform: translate3d(85px,0,0); }
         }
 
-        /* حاوية الأكفاريوم (الأسماك والفقاعات الخلفية الثابتة) */
+        /* حاوية الأكفاريوم (الأسماك والفقاعات الخلفية الثابتة بالنسبة للشاشة) */
         .aquarium {
             position: fixed;
             top: 0;
@@ -137,79 +136,6 @@
             z-index: 50; 
         } 
 
-        /* --- حاوية قاع الصفحة المطورة المنسابة والكاملة (Seabed Full-Width Footer) --- */
-        .seabed-footer {
-            margin-top: 120px; 
-            width: 100%; /* تمدد كامل بعرض الصفحة لإلغاء المظهر الدخيل المستطيل */
-            position: relative; 
-            padding: 90px 20px 50px 20px; 
-            /* تدرج لوني مائي انسيابي ينحدر بلطف تام إلى أزرق داكن سحيق كأعماق المحيط الفاخرة */
-            background: linear-gradient(180deg, #0369a1 0%, #075985 30%, #0f172a 70%, #020617 100%);
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column; 
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            z-index: 10;
-        }
-
-        /* أمواج القاع الخاصة بالفوتر لتمويجه مع الموقع بجمالية مطلقة */
-        .footer-waves {
-            position: absolute;
-            top: -79px; /* ترتفع لتغطي نقطة التلاقي بين المحيط والفوتر */
-            left: 0;
-            width: 100%;
-            height: 80px;
-            overflow: hidden;
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        .parallax-bottom > use {
-            animation: move-forever-bottom 25s cubic-bezier(.55,.5,.45,.5) infinite;
-        }
-        .parallax-bottom > use:nth-child(1) { animation-delay: -2s; animation-duration: 9s; }
-        .parallax-bottom > use:nth-child(2) { animation-delay: -4s; animation-duration: 13s; }
-        .parallax-bottom > use:nth-child(3) { animation-delay: -3s; animation-duration: 17s; }
-        .parallax-bottom > use:nth-child(4) { animation-delay: -5s; animation-duration: 21s; }
-
-        @keyframes move-forever-bottom {
-            0% { transform: translate3d(-90px,0,0); }
-            100% { transform: translate3d(85px,0,0); }
-        }
-
-        /* كائنات قاع البحر النابضة بالتنفس مستقرة الآن داخل الفوتر المنساب */
-        .bottom-creature {
-            position: absolute; 
-            user-select: none; 
-            animation: pulseScale 4s ease-in-out infinite; 
-            z-index: 1;
-        }
-        .c-crab { right: 8%; bottom: 35px; font-size: 65px; animation-delay: 0s; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15)); }
-        .c-shell { right: 22%; bottom: 25px; font-size: 55px; animation-delay: 1s; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15)); }
-        
-        /* نجم البحر في أقصى اليسار مع فلتر التلوين للأحمر البني المطور */
-        .c-star { 
-            left: 8%; 
-            bottom: 35px; 
-            font-size: 60px; 
-            animation-delay: 2s; 
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)) sepia(0.7) hue-rotate(330deg) saturate(3) brightness(0.7); 
-        }
-
-        /* تأثيرات الحركة والسباحة الدائرية */
-        @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 0; } 10% { opacity: 0.8; } 100% { transform: translateY(-120vh) scale(1.5); opacity: 0; } }
-        @keyframes swimRTL { 0% { right: -100px; transform: translateY(0px) scaleX(1); } 25% { transform: translateY(-20px) scaleX(1); } 50% { transform: translateY(0px) scaleX(1); } 75% { transform: translateY(20px) scaleX(1); } 100% { right: calc(100vw + 100px); transform: translateY(0px) scaleX(1); } }
-        @keyframes swimLTR { 0% { left: -100px; transform: translateY(0px) scaleX(-1); } 25% { transform: translateY(20px) scaleX(-1); } 50% { transform: translateY(0px) scaleX(-1); } 75% { transform: translateY(-20px) scaleX(-1); } 100% { left: calc(100vw + 100px); transform: translateY(0px) scaleX(-1); } }
-        
-        /* حركة الصعود والهبوط للكائنات المائية */
-        @keyframes floatUpDown {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-65vh) rotate(5deg); }
-        }
-        @keyframes pulseScale { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
-
         /* --- المحتوى الرئيسي للواجهة --- */
         .content-wrapper { 
             position: relative; 
@@ -218,8 +144,9 @@
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            padding: 0; /* تم إلغاء البادينغ ليتمدد الفوتر أفقياً بالكامل */
+            padding: 0; 
             box-sizing: border-box;
+            min-height: calc(100vh - 140px); /* يضمن تمدد الحاوية لتأخذ طول الشاشة بالكامل */
         }
         
         .header { 
@@ -322,7 +249,83 @@
         .card-desc { color: var(--text-muted); font-size: 16px; line-height: 1.6; font-weight: bold; margin: 0 0 25px 0; flex-grow: 1; }
         .card-btn { background: #0284c7; color: white; font-weight: bold; font-size: 16px; padding: 12px 35px; border-radius: 25px; transition: all 0.3s; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(2, 132, 199, 0.3); }
         .card:hover .card-btn { background: #0369a1; transform: scale(1.05); box-shadow: 0 6px 20px rgba(2, 132, 199, 0.4); }
+
+        /* --- حاوية قاع الصفحة المطورة المنسابة والكاملة (Seabed Full-Width Footer) --- */
+        .seabed-footer {
+            /* السحر البصري: دفع الفوتر للأسفل المطلق مع ترك مسافة زرقاء عميقة ومضمونة (250px) تفصله عن الكروت */
+            margin-top: auto; 
+            padding-top: 100px;
+            padding-bottom: 55px;
+            min-height: 250px; 
+            
+            width: 100%; /* تمدد كامل بعرض الصفحة لإلغاء المظهر الدخيل المستطيل */
+            position: relative; 
+            /* تدرج لوني مائي انسيابي معتم تماماً لمنع الأسماك والفقاعات الثابتة من الظهور أسفل رمال القاع */
+            background: linear-gradient(180deg, #0369a1 0%, #075985 25%, #0f172a 65%, #020617 100%);
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column; 
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            z-index: 15; /* أعلى من الأسماك والفقاعات لتغطيها بسلاسة أثناء النزول */
+        }
+
+        /* أمواج القاع الخاصة بالفوتر لتمويجه مع الموقع بجمالية مطلقة وبدون حواف حادة */
+        .footer-waves {
+            position: absolute;
+            top: -79px; /* ترتفع لتغطي نقطة التلاقي بين المحيط والفوتر */
+            left: 0;
+            width: 100%;
+            height: 80px;
+            overflow: hidden;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .parallax-bottom > use {
+            animation: move-forever-bottom 25s cubic-bezier(.55,.5,.45,.5) infinite;
+        }
+        .parallax-bottom > use:nth-child(1) { animation-delay: -2s; animation-duration: 9s; }
+        .parallax-bottom > use:nth-child(2) { animation-delay: -4s; animation-duration: 13s; }
+        .parallax-bottom > use:nth-child(3) { animation-delay: -3s; animation-duration: 17s; }
+        .parallax-bottom > use:nth-child(4) { animation-delay: -5s; animation-duration: 21s; }
+
+        @keyframes move-forever-bottom {
+            0% { transform: translate3d(-90px,0,0); }
+            100% { transform: translate3d(85px,0,0); }
+        }
+
+        /* كائنات قاع البحر النابضة بالتنفس مستقرة الآن داخل الفوتر المنساب */
+        .bottom-creature {
+            position: absolute; 
+            user-select: none; 
+            animation: pulseScale 4s ease-in-out infinite; 
+            z-index: 1;
+        }
+        .c-crab { right: 8%; bottom: 35px; font-size: 65px; animation-delay: 0s; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15)); }
+        .c-shell { right: 22%; bottom: 25px; font-size: 55px; animation-delay: 1s; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15)); }
         
+        /* نجم البحر في أقصى اليسار مع فلتر التلوين للأحمر البني المطور */
+        .c-star { 
+            left: 8%; 
+            bottom: 35px; 
+            font-size: 60px; 
+            animation-delay: 2s; 
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)) sepia(0.7) hue-rotate(330deg) saturate(3) brightness(0.7); 
+        }
+
+        /* تأثيرات الحركة والسباحة الدائرية */
+        @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 0; } 10% { opacity: 0.8; } 100% { transform: translateY(-120vh) scale(1.5); opacity: 0; } }
+        @keyframes swimRTL { 0% { right: -100px; transform: translateY(0px) scaleX(1); } 25% { transform: translateY(-20px) scaleX(1); } 50% { transform: translateY(0px) scaleX(1); } 75% { transform: translateY(20px) scaleX(1); } 100% { right: calc(100vw + 100px); transform: translateY(0px) scaleX(1); } }
+        @keyframes swimLTR { 0% { left: -100px; transform: translateY(0px) scaleX(-1); } 25% { transform: translateY(20px) scaleX(-1); } 50% { transform: translateY(0px) scaleX(-1); } 75% { transform: translateY(-20px) scaleX(-1); } 100% { left: calc(100vw + 100px); transform: translateY(0px) scaleX(-1); } }
+        
+        /* حركة الصعود والهبوط للكائنات المائية */
+        @keyframes floatUpDown {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-65vh) rotate(5deg); }
+        }
+        @keyframes pulseScale { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
         @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -447,7 +450,7 @@
         <div class="header">
             <h1>ماتيا الجليل</h1>
             <div class="header-subtitle">منطقة الإبداع والتمكين 🌟</div>
-            <p>مساحة آمنة وممتعة للأبطال للتعبير عن أنهم، استكشاف مشاعرهم، وصنع أجمل الذكريات. اختر نشاطك المفضل لتبدأ رحلتك الحركية والذهنية الفريدة!</p>
+            <p>مساحة آمنة وممتعة للأبطال للتعبير عن أنفسهم، استكشاف مشاعرهم، وصنع أجمل الذكريات. اختر نشاطك المفضل لتبدأ رحلتك الحركية والذهنية الفريدة!</p>
         </div>
 
         <div class="cards-grid">
