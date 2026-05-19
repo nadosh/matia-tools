@@ -20,9 +20,6 @@
             overflow: hidden;
             background: linear-gradient(180deg, #7dd3fc 0%, #0ea5e9 100%); /* تدرج مائي متناسق مع السطح */
             height: var(--banner-height);
-            display: flex;
-            align-items: center;
-            justify-content: center;
             position: relative;
         }
 
@@ -36,12 +33,12 @@
             pointer-events: none; /* لكي لا تمنع الأسماك الطفل من التفاعل أو نسخ النص */
         }
 
-        /* طبقة الأسماك الخلفية (خلف المربع الشفاف) */
+        /* طبقة الأسماك الخلفية (خلف الكلمات العائمة) */
         .bg-layer {
             z-index: 1;
         }
 
-        /* طبقة الأسماك الأمامية (تمر أمام المربع الشفاف) */
+        /* طبقة الأسماك الأمامية (تمر أمام الكلمات مباشرة لتأثير ثلاثي الأبعاد مذهل) */
         .fg-layer {
             z-index: 20;
         }
@@ -64,20 +61,20 @@
 
         /* ================= توزيع الأسماك في الأعلى والأسفل ================= */
 
-        /* 1. الأسماك في أعلى البانير (Top Fish) */
+        /* 1. الأسماك في أعلى البانير تسبح بحرية تامة في الفضاء المفتوح */
         .top-fish-1 {
             top: 8%;
             animation-duration: 26s;
             font-size: 100px; /* سمكة صفراء ذهبية كبيرة في الخلفية */
         }
         .top-fish-2 {
-            top: 15%;
+            top: 16%;
             animation-duration: 32s;
-            font-size: 85px; /* سمكة زرقاء تسبح في الأمام وتمر من فوق المربع */
+            font-size: 85px; /* سمكة زرقاء تسبح في الأمام */
             animation-delay: 4s;
         }
 
-        /* 2. الأسماك في أسفل البانير (Bottom Fish) */
+        /* 2. الأسماك في أسفل البانير تتداخل وتمر من تحت وفوق الكلمات العائمة */
         .bottom-fish-1 {
             bottom: 8%;
             animation-duration: 28s;
@@ -85,9 +82,9 @@
             animation-delay: 8s;
         }
         .bottom-fish-2 {
-            bottom: 15%;
+            bottom: 12%;
             animation-duration: 24s;
-            font-size: 95px; /* سمكة صفراء أخرى تسبح في الأمام وتمر من تحت المربع */
+            font-size: 95px; /* سمكة صفراء أخرى تمر من تحت وأمام الكلمات العائمة */
             animation-delay: 12s;
         }
 
@@ -121,35 +118,42 @@
             100% { transform: translateY(-450px) scale(1.4); opacity: 0; }
         }
 
-        /* ================= المربع الشفاف في المنتصف ================= */
+        /* ================= منطقة الكلمات العائمة والمتموضعة في الأسفل بدون خلفية ================= */
         .banner-content {
-            position: relative;
-            z-index: 10; /* في المنتصف بين طبقة الأسماك الخلفية والأمامية */
+            position: absolute;
+            bottom: 30px; /* تموضعه عائماً بشكل مثالي في قاع البانر */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10; /* في المنتصف بين طبقة الأسماك الخلفية والأمامية لتأثير العمق */
             text-align: center;
             color: white;
             padding: 0 20px;
+            width: 100%;
+            box-sizing: border-box;
             animation: fadeIn 1.2s ease-out;
         }
 
-        /* لافتة زجاجية خفيفة خلف العنوان لضمان وضوح القراءة بشكل مريح للأعصاب */
+        /* تم إلغاء خلفية الكارت والحدود تماماً لتبدو عائمة فوق الماء */
         .title-card {
-            background: rgba(255, 255, 255, 0.18);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            padding: 22px 50px;
-            border-radius: 24px;
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+            background: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            border: none;
+            box-shadow: none;
+            padding: 10px 20px;
             display: inline-block;
             animation: gentleFloat 5s ease-in-out infinite;
         }
 
+        /* تحسين ظلال النصوص العائمة لضمان وضوح خارق وسهولة في القراءة */
         .title-card h1 {
             margin: 0;
             font-size: 52px;
             font-weight: 900;
-            letter-spacing: 1.5px;
-            text-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            color: #ffffff;
+            letter-spacing: 1px;
+            /* ظلال ذكية مركبة بلون أزرق الأعماق الداكن لبروز النص بجمال وبدون خلفية */
+            text-shadow: 0 4px 15px rgba(2, 132, 199, 0.7), 0 2px 4px rgba(15, 23, 42, 0.4);
         }
 
         .title-card p {
@@ -157,13 +161,14 @@
             font-size: 20px;
             font-weight: bold;
             color: #f0f9ff;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            /* ظلال خفيفة للفقرة الفرعية للتألق على المياه */
+            text-shadow: 0 3px 10px rgba(2, 132, 199, 0.7), 0 2px 4px rgba(15, 23, 42, 0.4);
         }
 
-        /* حركة طفو هادئة جداً للعنوان البصري في المنتصف */
+        /* حركة طفو هادئة جداً للعنوان البصري */
         @keyframes gentleFloat {
             0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-8px); }
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: scale(0.95); }
@@ -172,8 +177,9 @@
 
         @media (max-width: 600px) {
             :root { --banner-height: 320px; }
-            .title-card { padding: 15px 25px; }
-            .title-card h1 { font-size: 34px; }
+            .banner-content { bottom: 20px; }
+            .title-card { padding: 5px 15px; }
+            .title-card h1 { font-size: 32px; }
             .title-card p { font-size: 15px; }
             .top-fish-1 { font-size: 75px; }
             .top-fish-2 { font-size: 65px; }
@@ -184,29 +190,29 @@
 </head>
 <body>
 
-    <!-- 1. الطبقة الخلفية: الأسماك التي تسبح خلف المربع الشفاف -->
+    <!-- 1. الطبقة الخلفية: الأسماك التي تسبح خلف الكلمات العائمة -->
     <div class="aquarium-layer bg-layer">
         <!-- الفقاعات اللطيفة -->
         <div class="bubble b1">🫧</div>
         <div class="bubble b2">🫧</div>
         <div class="bubble b3">🫧</div>
 
-        <div class="aquatic-element fish-left top-fish-1">🐠</div> <!-- سمكة صفراء بالأعلى خلف المربع -->
-        <div class="aquatic-element fish-right bottom-fish-1">🐡</div> <!-- سمكة منتفخة بالأسفل خلف المربع -->
+        <div class="aquatic-element fish-left top-fish-1">🐠</div> <!-- سمكة صفراء بالأعلى خلف الكلمات -->
+        <div class="aquatic-element fish-right bottom-fish-1">🐡</div> <!-- سمكة منتفخة بالأسفل خلف الكلمات -->
     </div>
 
-    <!-- 2. الطبقة الوسطى: المربع الشفاف (العنوان) في المنتصف تماماً -->
+    <!-- 2. الطبقة الوسطى: الكلمات العائمة في قاع البانر بجمال تام وبدون أي خلفية -->
     <div class="banner-content">
         <div class="title-card">
-            <h1>ماتيا الجليل</h1>
-            <p>منصة الإبداع والتمكين للأبطال المتميزين 🌟</p>
+            <h1>أنشطتي الإبداعية 🎨</h1>
+            <p>أعبّر عن نفسي، أكتشف قدراتي، وأصنع أجمل الذكريات ✨</p>
         </div>
     </div>
 
-    <!-- 3. الطبقة الأمامية: الأسماك التي تسبح أمام المربع الشفاف (تأثير ثلاثي الأبعاد) -->
+    <!-- 3. الطبقة الأمامية: الأسماك الكبيرة تمر من أمام الكلمات (تأثير ثلاثي الأبعاد حقيقي) -->
     <div class="aquarium-layer fg-layer">
-        <div class="aquatic-element fish-right top-fish-2">🐟</div> <!-- سمكة زرقاء بالأعلى تمر أمام المربع الشفاف -->
-        <div class="aquatic-element fish-left bottom-fish-2">🐠</div> <!-- سمكة صفراء بالأسفل تمر أمام المربع الشفاف -->
+        <div class="aquatic-element fish-right top-fish-2">🐟</div> <!-- سمكة زرقاء بالأعلى تمر من أمام الكلمات العائمة -->
+        <div class="aquatic-element fish-left bottom-fish-2">🐠</div> <!-- سمكة صفراء بالأسفل تمر من أمام الكلمات العائمة -->
     </div>
 
 </body>
